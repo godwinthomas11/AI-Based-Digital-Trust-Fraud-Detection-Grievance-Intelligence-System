@@ -1,13 +1,13 @@
-# 🚀 AI Digital Trust & Fraud Detection System
+#  AI Digital Trust & Fraud Detection System
 
-## 📌 Project Overview
+##  Project Overview
 This project is an AI-inspired Digital Trust and Fraud Detection System developed using Java, JSP, Servlets, and MySQL. The system helps users identify fraudulent government scheme messages, calculate a trust score, and submit grievances for suspicious or fake schemes.
 
 With the rapid growth of Digital India services, this system aims to enhance digital trust, improve transparency, and protect users from online fraud.
 
 ---
 
-## 🎯 Key Features
+##  Key Features
 - 🔍 Fraud Detection using rule-based NLP techniques
 - 📊 Trust Score Calculation (0–100%)
 - 🌐 URL Validation (.gov.in vs suspicious domains)
@@ -18,7 +18,7 @@ With the rapid growth of Digital India services, this system aims to enhance dig
 
 ---
 
-## 🧠 System Workflow
+##  System Workflow
 1. User registers and logs into the system  
 2. User enters a scheme message  
 3. System preprocesses the text (cleaning, tokenization)  
@@ -33,7 +33,7 @@ With the rapid growth of Digital India services, this system aims to enhance dig
 
 ---
 
-## 🏗️ Architecture (MVC)
+##  Architecture (MVC)
 
 - **View:** JSP (Frontend UI)
 - **Controller:** Java Servlets (Business Logic)
@@ -41,7 +41,7 @@ With the rapid growth of Digital India services, this system aims to enhance dig
 
 ---
 
-## ⚙️ Technologies Used
+##  Technologies Used
 
 ### 💻 Backend
 - Java (Servlets)
@@ -65,7 +65,7 @@ With the rapid growth of Digital India services, this system aims to enhance dig
 
 ---
 
-## 🗄️ Database Schema
+##  Database Schema
 
 ### 📁 user_db
 - **users**
@@ -90,7 +90,7 @@ With the rapid growth of Digital India services, this system aims to enhance dig
 
 ---
 
-## 🧠 Core Concepts Used
+##  Core Concepts Used
 - Rule-Based NLP
 - Tokenization
 - Pattern Recognition
@@ -108,7 +108,7 @@ With the rapid growth of Digital India services, this system aims to enhance dig
 
 ---
 
-## 🚀 How to Run the Project
+##  How to Run the Project
 
 1. Install Apache Tomcat  
 2. Install MySQL and create required databases  
