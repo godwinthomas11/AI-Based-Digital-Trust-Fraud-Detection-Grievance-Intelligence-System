@@ -22,28 +22,136 @@ import javax.servlet.http.Part;
 public class AnalyzeSchemeServlet extends HttpServlet {
 
     private int calculateScore(String msg) {
-        int score = 100;
         if (msg == null || msg.trim().isEmpty()) return 0;
-        
-        String cleanMsg = msg.toLowerCase().replaceAll("[^a-zA-Z0-9 ]", "");
+
+        // Keep raw lowercase for URL checks (we need dots/slashes)
         String rawLower = msg.toLowerCase();
-        
-        if (cleanMsg.contains("lottery")) score -= 25;
-        if (cleanMsg.contains("free")) score -= 15;
-        if (cleanMsg.contains("click")) score -= 15;
-        if (cleanMsg.contains("verify")) score -= 10;
-        if (cleanMsg.contains("bank")) score -= 10;
-        if (cleanMsg.contains("won")) score -= 20;
-        if (cleanMsg.contains("rs")) score -= 5;
-        if (cleanMsg.contains("urgent")) score -= 15;
-        if (cleanMsg.contains("pay")) score -= 15;
-        if (cleanMsg.contains("fee")) score -= 10;
-        
-        if (rawLower.contains(".gov.in")) score += 30;
-        
-        if (score < 0) score = 0;
+
+        // Cleaned version (no special chars) for keyword checks
+        String cleanMsg = rawLower.replaceAll("[^a-z0-9 ]", " ");
+
+        // -------------------------------------------------------
+        // START FROM 100 — DEDUCT for every red flag found
+        // -------------------------------------------------------
+        int score = 100;
+
+        // --- HIGH SEVERITY fraud keywords (-25 each) ---
+        if (cleanMsg.contains("lottery"))           score -= 25;
+        if (cleanMsg.contains("won"))               score -= 25;
+        if (cleanMsg.contains("winner"))            score -= 25;
+        if (cleanMsg.contains("prize"))             score -= 25;
+        if (cleanMsg.contains("jackpot"))           score -= 25;
+        if (cleanMsg.contains("congratulations"))   score -= 20;
+        if (cleanMsg.contains("selected"))          score -= 15;
+        if (cleanMsg.contains("lucky"))             score -= 15;
+
+        // --- MEDIUM SEVERITY fraud keywords (-20 each) ---
+        if (cleanMsg.contains("free money"))        score -= 20;
+        if (cleanMsg.contains("free cash"))         score -= 20;
+        if (cleanMsg.contains("free reward"))       score -= 20;
+        if (cleanMsg.contains("claim now"))         score -= 20;
+        if (cleanMsg.contains("claim your"))        score -= 20;
+        if (cleanMsg.contains("act now"))           score -= 20;
+        if (cleanMsg.contains("limited time"))      score -= 20;
+        if (cleanMsg.contains("expire"))            score -= 15;
+        if (cleanMsg.contains("urgent"))            score -= 20;
+        if (cleanMsg.contains("immediately"))       score -= 15;
+        if (cleanMsg.contains("otp"))               score -= 20;
+        if (cleanMsg.contains("account blocked"))   score -= 25;
+        if (cleanMsg.contains("suspended"))         score -= 20;
+
+        // --- "free" alone is suspicious but weaker (-15) ---
+        if (cleanMsg.contains("free"))              score -= 15;
+
+        // --- FINANCIAL red flags ---
+        if (cleanMsg.contains("pay"))               score -= 15;
+        if (cleanMsg.contains("fee"))               score -= 15;
+        if (cleanMsg.contains("processing fee"))    score -= 25;
+        if (cleanMsg.contains("registration fee"))  score -= 25;
+        if (cleanMsg.contains("advance"))           score -= 15;
+        if (cleanMsg.contains("deposit"))           score -= 15;
+        if (cleanMsg.contains("transfer"))          score -= 10;
+        if (cleanMsg.contains("wallet"))            score -= 10;
+        if (cleanMsg.contains("upi"))               score -= 10;
+        if (cleanMsg.contains("paytm"))             score -= 10;
+
+        // --- PHISHING / DATA theft red flags ---
+        if (cleanMsg.contains("verify"))            score -= 15;
+        if (cleanMsg.contains("click"))             score -= 15;
+        if (cleanMsg.contains("click here"))        score -= 20;
+        if (cleanMsg.contains("open link"))         score -= 20;
+        if (cleanMsg.contains("bank"))              score -= 10;
+        if (cleanMsg.contains("account number"))    score -= 20;
+        if (cleanMsg.contains("password"))          score -= 20;
+        if (cleanMsg.contains("cvv"))               score -= 25;
+        if (cleanMsg.contains("pin"))               score -= 15;
+        if (cleanMsg.contains("aadhaar"))           score -= 15;
+        if (cleanMsg.contains("pan card"))          score -= 15;
+
+        // --- Amount mentions with Rs/₹ ---
+        if (rawLower.matches(".*[₹rs\\.\\s]\\s*[0-9,]+.*")) score -= 15;
+
+        // -------------------------------------------------------
+        // URL ANALYSIS — this is the KEY fix for your test case
+        // -------------------------------------------------------
+        boolean hasUrl = rawLower.contains("http") || rawLower.contains("www") || rawLower.contains(".com")
+                      || rawLower.contains(".net") || rawLower.contains(".org") || rawLower.contains(".in");
+
+        if (hasUrl) {
+            if (rawLower.contains(".gov.in")) {
+                // Official government domain — strong trust boost
+                score += 40;
+            } else if (rawLower.contains(".nic.in")) {
+                // NIC is also official govt infrastructure
+                score += 35;
+            } else if (rawLower.contains(".edu.in") || rawLower.contains(".ac.in")) {
+                // Educational/academic — mild trust
+                score += 10;
+            } else {
+                // Any non-gov URL in a "scheme" message is a RED FLAG
+                score -= 40;
+
+                // Extra penalty for obviously suspicious domains
+                if (rawLower.contains("freemoney")   || rawLower.contains("free-money"))   score -= 20;
+                if (rawLower.contains("prize")       || rawLower.contains("win"))           score -= 20;
+                if (rawLower.contains("lottery"))                                           score -= 20;
+                if (rawLower.contains("claim"))                                             score -= 15;
+                if (rawLower.contains("reward"))                                            score -= 15;
+                if (rawLower.contains("lucky"))                                             score -= 15;
+                if (rawLower.contains("gift"))                                              score -= 15;
+                if (rawLower.contains("cash"))                                              score -= 15;
+                if (rawLower.contains("money"))                                             score -= 15;
+                if (rawLower.contains("bit.ly") || rawLower.contains("tinyurl")
+                 || rawLower.contains("t.co")   || rawLower.contains("goo.gl"))            score -= 20; // shortened URLs are suspicious
+            }
+        }
+
+        // -------------------------------------------------------
+        // COMBINATION PENALTIES — multiple red flags together
+        // are much worse than each one alone
+        // -------------------------------------------------------
+        int fraudKeywordCount = 0;
+        if (cleanMsg.contains("free"))        fraudKeywordCount++;
+        if (cleanMsg.contains("won"))         fraudKeywordCount++;
+        if (cleanMsg.contains("lottery"))     fraudKeywordCount++;
+        if (cleanMsg.contains("prize"))       fraudKeywordCount++;
+        if (cleanMsg.contains("urgent"))      fraudKeywordCount++;
+        if (cleanMsg.contains("click"))       fraudKeywordCount++;
+        if (cleanMsg.contains("verify"))      fraudKeywordCount++;
+        if (cleanMsg.contains("pay"))         fraudKeywordCount++;
+        if (cleanMsg.contains("fee"))         fraudKeywordCount++;
+        if (cleanMsg.contains("claim"))       fraudKeywordCount++;
+
+        // If 3 or more fraud keywords appear together, extra penalty
+        if (fraudKeywordCount >= 3) score -= 20;
+        if (fraudKeywordCount >= 5) score -= 20; // stacks
+
+        // -------------------------------------------------------
+        // CLAMP between 0 and 100
+        // -------------------------------------------------------
+        if (score < 0)   score = 0;
         if (score > 100) score = 100;
-        
+
         return score;
     }
 
@@ -51,7 +159,6 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         StringBuilder textBuilder = new StringBuilder();
         try (InputStream input = filePart.getInputStream();
              BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
-            
             String line;
             while ((line = reader.readLine()) != null) {
                 textBuilder.append(line).append(" ");
@@ -64,11 +171,11 @@ public class AnalyzeSchemeServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String message = request.getParameter("message");
-        String url = request.getParameter("url");
-        Part textPart = request.getPart("text_file");
-        
+        String url     = request.getParameter("url");
+        Part textPart  = request.getPart("text_file");
+
         String textToAnalyze = "";
-        
+
         if (textPart != null && textPart.getSize() > 0) {
             textToAnalyze = extractTextFromTxt(textPart);
         } else if (message != null && !message.trim().isEmpty()) {
@@ -78,13 +185,17 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         }
 
         int trustScore = calculateScore(textToAnalyze);
-        String label = (trustScore >= 75) ? "SAFE" : "FRAUD";
-        
+        String label = (trustScore >= 60) ? "SAFE" : "FRAUD";
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/digital_trust", "root", "root");
-            PreparedStatement ps = con.prepareStatement("INSERT INTO analysis(message, score, label) VALUES (?,?,?)");
-            String dbText = textToAnalyze.length() > 255 ? textToAnalyze.substring(0, 255) : textToAnalyze;
+            Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/digital_trust", "root", "root");
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO analysis(message, score, label) VALUES (?,?,?)");
+            String dbText = textToAnalyze.length() > 255
+                          ? textToAnalyze.substring(0, 255)
+                          : textToAnalyze;
             ps.setString(1, dbText);
             ps.setInt(2, trustScore);
             ps.setString(3, label);
@@ -97,15 +208,15 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         String profileMatch = "No";
         if (label.equals("SAFE")) {
             Double userIncome = (Double) session.getAttribute("user_income");
-            if (userIncome != null && userIncome <= 800000) { 
+            if (userIncome != null && userIncome <= 800000) {
                 profileMatch = "Yes";
             }
         }
 
-        request.setAttribute("trustScore", String.valueOf(trustScore));
-        request.setAttribute("isGenuine", label);
+        request.setAttribute("trustScore",  String.valueOf(trustScore));
+        request.setAttribute("isGenuine",   label);
         request.setAttribute("profileMatch", profileMatch);
-        
+
         request.getRequestDispatcher("check_scheme.jsp").forward(request, response);
     }
 }
