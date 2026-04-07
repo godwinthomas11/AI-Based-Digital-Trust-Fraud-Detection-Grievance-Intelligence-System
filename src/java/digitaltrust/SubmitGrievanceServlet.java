@@ -13,25 +13,39 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/SubmitGrievanceServlet")
 public class SubmitGrievanceServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String message = request.getParameter("scam_details"); 
-        
+
+    // ── Railway MySQL credentials ──────────────────────────────────
+    private static final String DB_URL  = "jdbc:mysql://mysql.railway.internal:3306/railway";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
+    // ──────────────────────────────────────────────────────────────
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String message = request.getParameter("scam_details");
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/digital_trust", "root", "root");
-            
-            PreparedStatement ps = con.prepareStatement("INSERT INTO grievances(message, status) VALUES (?,?)");
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO grievances(message, status) VALUES (?,?)");
             ps.setString(1, message);
             ps.setString(2, "Pending");
             ps.executeUpdate();
-            
+
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
             out.println("<h2>Grievance Submitted Successfully to Government Portal</h2>");
             out.println("<br><a href='index.jsp'>Back to Dashboard</a>");
-            
+
         } catch (Exception e) {
             e.printStackTrace();
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            out.println("<h3 style='color:red;'>Error submitting grievance: " + e.getMessage() + "</h3>");
+            out.println("<br><a href='index.jsp'>Back to Dashboard</a>");
         }
     }
 }

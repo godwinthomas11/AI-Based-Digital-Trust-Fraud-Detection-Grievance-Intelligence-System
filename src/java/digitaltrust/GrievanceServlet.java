@@ -9,6 +9,12 @@ import java.sql.*;
 @WebServlet("/GrievanceServlet")
 public class GrievanceServlet extends HttpServlet {
 
+    // ── Railway MySQL credentials ──────────────────────────────────
+    private static final String DB_URL  = "jdbc:mysql://mysql.railway.internal:3306/railway";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
+    // ──────────────────────────────────────────────────────────────
+
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
@@ -18,16 +24,12 @@ public class GrievanceServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/digital_trust", "root", "root");
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
 
             PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO grievances(message,status) VALUES (?,?)");
-
+                "INSERT INTO grievances(message, status) VALUES (?,?)");
             ps.setString(1, msg);
             ps.setString(2, "Pending");
-
             ps.executeUpdate();
 
             res.getWriter().println("<h2>Grievance Submitted Successfully</h2>");

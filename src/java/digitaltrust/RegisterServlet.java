@@ -13,21 +13,31 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        int age = Integer.parseInt(request.getParameter("age"));
-        String address = request.getParameter("address");
-        String bloodGroup = request.getParameter("blood_group");
+
+    // ── Railway MySQL credentials ──────────────────────────────────
+    private static final String DB_URL  = "jdbc:mysql://mysql.railway.internal:3306/railway";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
+    // ──────────────────────────────────────────────────────────────
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String name          = request.getParameter("name");
+        String email         = request.getParameter("email");
+        String password      = request.getParameter("password");
+        int    age           = Integer.parseInt(request.getParameter("age"));
+        String address       = request.getParameter("address");
+        String bloodGroup    = request.getParameter("blood_group");
         String maritalStatus = request.getParameter("marital_status");
-        double income = Double.parseDouble(request.getParameter("income"));
+        double income        = Double.parseDouble(request.getParameter("income"));
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/user_db", "root", "root"); 
-            
-            String sql = "INSERT INTO users(name, email, password, age, address, blood_group, marital_status, income) VALUES (?,?,?,?,?,?,?,?)";
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            String sql = "INSERT INTO users(name, email, password, age, address, blood_group, marital_status, income) "
+                       + "VALUES (?,?,?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, name);
             ps.setString(2, email);
@@ -37,10 +47,10 @@ public class RegisterServlet extends HttpServlet {
             ps.setString(6, bloodGroup);
             ps.setString(7, maritalStatus);
             ps.setDouble(8, income);
-            
+
             ps.executeUpdate();
             response.sendRedirect("login.jsp");
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             response.setContentType("text/html");
