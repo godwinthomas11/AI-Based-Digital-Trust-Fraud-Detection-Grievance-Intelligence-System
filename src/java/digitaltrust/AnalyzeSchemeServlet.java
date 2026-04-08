@@ -21,9 +21,9 @@ import javax.servlet.http.Part;
 @MultipartConfig(maxFileSize = 16777215)
 public class AnalyzeSchemeServlet extends HttpServlet {
 
-    private static final String DB_URL  = "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "root";
-    private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
+    private static final String DB_URL  = "jdbc:mysql://mysql-379ef001-godwinthomas118-b3da.k.aivencloud.com:24609/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String DB_USER = "avnadmin";
+    private static final String DB_PASS = "AVNS_oRjKZHLYNGvSNvLLlZI";
 
     private int calculateScore(String msg) {
         if (msg == null || msg.trim().isEmpty()) return 0;
