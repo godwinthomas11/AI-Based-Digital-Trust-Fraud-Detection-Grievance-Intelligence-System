@@ -21,11 +21,9 @@ import javax.servlet.http.Part;
 @MultipartConfig(maxFileSize = 16777215)
 public class AnalyzeSchemeServlet extends HttpServlet {
 
-    // ── Railway MySQL credentials ──────────────────────────────────
-    private static final String DB_URL  =  "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "railway";
+    private static final String DB_URL  = "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String DB_USER = "root";
     private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
-    // ──────────────────────────────────────────────────────────────
 
     private int calculateScore(String msg) {
         if (msg == null || msg.trim().isEmpty()) return 0;
@@ -35,7 +33,6 @@ public class AnalyzeSchemeServlet extends HttpServlet {
 
         int score = 100;
 
-        // --- HIGH SEVERITY fraud keywords ---
         if (cleanMsg.contains("lottery"))           score -= 25;
         if (cleanMsg.contains("won"))               score -= 25;
         if (cleanMsg.contains("winner"))            score -= 25;
@@ -45,7 +42,6 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         if (cleanMsg.contains("selected"))          score -= 15;
         if (cleanMsg.contains("lucky"))             score -= 15;
 
-        // --- MEDIUM SEVERITY fraud keywords ---
         if (cleanMsg.contains("free money"))        score -= 20;
         if (cleanMsg.contains("free cash"))         score -= 20;
         if (cleanMsg.contains("free reward"))       score -= 20;
@@ -61,7 +57,6 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         if (cleanMsg.contains("suspended"))         score -= 20;
         if (cleanMsg.contains("free"))              score -= 15;
 
-        // --- FINANCIAL red flags ---
         if (cleanMsg.contains("pay"))               score -= 15;
         if (cleanMsg.contains("fee"))               score -= 15;
         if (cleanMsg.contains("processing fee"))    score -= 25;
@@ -73,7 +68,6 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         if (cleanMsg.contains("upi"))               score -= 10;
         if (cleanMsg.contains("paytm"))             score -= 10;
 
-        // --- PHISHING / DATA theft red flags ---
         if (cleanMsg.contains("verify"))            score -= 15;
         if (cleanMsg.contains("click"))             score -= 15;
         if (cleanMsg.contains("click here"))        score -= 20;
@@ -86,10 +80,8 @@ public class AnalyzeSchemeServlet extends HttpServlet {
         if (cleanMsg.contains("aadhaar"))           score -= 15;
         if (cleanMsg.contains("pan card"))          score -= 15;
 
-        // --- Amount mentions with Rs / ₹ ---
         if (rawLower.matches(".*[₹rs\\.\\s]\\s*[0-9,]+.*")) score -= 15;
 
-        // --- URL ANALYSIS ---
         boolean hasUrl = rawLower.contains("http")
                       || rawLower.contains("www")
                       || rawLower.contains(".com")
@@ -120,7 +112,6 @@ public class AnalyzeSchemeServlet extends HttpServlet {
             }
         }
 
-        // --- COMBINATION PENALTIES ---
         int fraudKeywordCount = 0;
         if (cleanMsg.contains("free"))    fraudKeywordCount++;
         if (cleanMsg.contains("won"))     fraudKeywordCount++;

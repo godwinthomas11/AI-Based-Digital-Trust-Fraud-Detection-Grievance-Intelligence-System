@@ -8,8 +8,6 @@ import javax.servlet.http.*;
 @WebServlet("/TrustServlet")
 public class TrustServlet extends HttpServlet {
 
-    // TrustServlet does not write to the database — no credentials needed here.
-
     private int calculateScore(String msg) {
         msg = msg.toLowerCase().replaceAll("[^a-zA-Z0-9 ]", "");
 

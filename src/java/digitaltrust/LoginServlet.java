@@ -9,11 +9,9 @@ import java.sql.*;
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
-    // ── Railway MySQL credentials ──────────────────────────────────
-    private static final String DB_URL  =  "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "railway";
+    private static final String DB_URL  = "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String DB_USER = "root";
     private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
-    // ──────────────────────────────────────────────────────────────
 
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
@@ -34,9 +32,9 @@ public class LoginServlet extends HttpServlet {
 
             if (rs.next()) {
                 HttpSession session = req.getSession();
-                session.setAttribute("user",               rs.getString("name"));
-                session.setAttribute("user_income",        rs.getDouble("income"));
-                session.setAttribute("user_age",           rs.getInt("age"));
+                session.setAttribute("user",                rs.getString("name"));
+                session.setAttribute("user_income",         rs.getDouble("income"));
+                session.setAttribute("user_age",            rs.getInt("age"));
                 session.setAttribute("user_marital_status", rs.getString("marital_status"));
 
                 res.sendRedirect("index.jsp");

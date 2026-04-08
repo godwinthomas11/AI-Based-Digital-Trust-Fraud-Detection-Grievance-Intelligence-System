@@ -9,11 +9,9 @@ import java.sql.*;
 @WebServlet("/GrievanceServlet")
 public class GrievanceServlet extends HttpServlet {
 
-    // ── Railway MySQL credentials ──────────────────────────────────
-    private static final String DB_URL  =  "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "railway";
+    private static final String DB_URL  = "jdbc:mysql://maglev.proxy.rlwy.net:11997/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String DB_USER = "root";
     private static final String DB_PASS = "FQmnmekFaZJ1OckDWxOGmFudvuPKNURx";
-    // ──────────────────────────────────────────────────────────────
 
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
