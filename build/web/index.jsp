@@ -13,7 +13,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — Digital Trust System</title>
+    <title>Dashboard - Digital Trust System</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -54,16 +54,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(150px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .blob-1 { width: 700px; height: 700px; background: rgba(99,179,237,0.05); top: -300px; right: -200px; }
-        .blob-2 { width: 500px; height: 500px; background: rgba(79,209,197,0.04); bottom: -200px; left: -100px; }
 
         /* NAVBAR */
         .navbar {
@@ -600,9 +590,6 @@
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-left">
@@ -624,7 +611,7 @@
                 <div class="user-avatar"><%= userName.substring(0,1).toUpperCase() %></div>
                 <span class="user-name"><%= userName %></span>
             </div>
-            <a href="login.jsp" class="btn-logout">Sign Out</a>
+            <a href="LogoutServlet" class="btn-logout">Sign Out</a>
         </div>
     </nav>
 
@@ -640,35 +627,35 @@
         <div class="stats-row">
             <div class="stat-card blue">
                 <div class="stat-card-top">
-                    <div class="stat-icon blue">🔍</div>
-                    <div class="stat-trend up">↑ 12%</div>
+                    <div class="stat-icon blue">Check</div>
+                    <div class="stat-trend up">Ready</div>
                 </div>
-                <div class="stat-value">2.3M+</div>
-                <div class="stat-label">Total scheme scans</div>
+                <div class="stat-value">Analyze</div>
+                <div class="stat-label">Message, URL, or text file</div>
             </div>
             <div class="stat-card teal">
                 <div class="stat-card-top">
-                    <div class="stat-icon teal">🚨</div>
-                    <div class="stat-trend up">↑ 8%</div>
+                    <div class="stat-icon teal">Flag</div>
+                    <div class="stat-trend up">After scan</div>
                 </div>
-                <div class="stat-value">18,492</div>
-                <div class="stat-label">Frauds blocked today</div>
+                <div class="stat-value">Report</div>
+                <div class="stat-label">Save suspicious schemes</div>
             </div>
             <div class="stat-card green">
                 <div class="stat-card-top">
-                    <div class="stat-icon green">✅</div>
-                    <div class="stat-trend up">98.4%</div>
+                    <div class="stat-icon green">User</div>
+                    <div class="stat-trend up">Profile</div>
                 </div>
-                <div class="stat-value">98.4%</div>
-                <div class="stat-label">Detection accuracy</div>
+                <div class="stat-value">Match</div>
+                <div class="stat-label">Basic eligibility check</div>
             </div>
             <div class="stat-card orange">
                 <div class="stat-card-top">
-                    <div class="stat-icon orange">💰</div>
-                    <div class="stat-trend down">Saved</div>
+                    <div class="stat-icon orange">Lock</div>
+                    <div class="stat-trend up">30 min</div>
                 </div>
-                <div class="stat-value">₹47Cr</div>
-                <div class="stat-label">Public funds protected</div>
+                <div class="stat-value">Secure</div>
+                <div class="stat-label">Session-protected access</div>
             </div>
         </div>
 
@@ -676,21 +663,21 @@
         <div class="action-section">
             <div class="section-head">
                 <div class="section-title">Scheme Verification</div>
-                <div class="section-badge">AI-Powered</div>
+                <div class="section-badge">Rule-Based</div>
             </div>
 
             <div class="cta-card">
-                <div class="shield-wrap">🛡️</div>
+                <div class="shield-wrap">Shield</div>
                 <div class="cta-title">Check any Government Scheme</div>
-                <div class="cta-desc">Paste a message, share a URL, or upload a document. Our NLP engine analyzes it in seconds and gives you a Trust Score with profile eligibility check.</div>
+                <div class="cta-desc">Paste a message, share a URL, or upload a text document. The verification rules check scam triggers, risky links, and basic profile eligibility.</div>
                 <a href="check_scheme.jsp" class="cta-btn">
                     <span>Analyze a Scheme Now</span>
-                    <span>→</span>
+                    <span>&rarr;</span>
                 </a>
                 <div class="cta-meta">
-                    <div class="cta-meta-item">⚡ Results in under 2 seconds</div>
-                    <div class="cta-meta-item">🔗 URL & file upload supported</div>
-                    <div class="cta-meta-item">📊 Trust score + eligibility check</div>
+                    <div class="cta-meta-item">Trust score generated instantly</div>
+                    <div class="cta-meta-item">URL and .txt upload supported</div>
+                    <div class="cta-meta-item">Eligibility check included</div>
                 </div>
             </div>
         </div>
@@ -698,22 +685,22 @@
         <!-- Features -->
         <div class="features-grid">
             <a href="check_scheme.jsp" class="feature-card">
-                <div class="feature-icon blue">🔬</div>
+                <div class="feature-icon blue">Text</div>
                 <div class="feature-name">Fraud Keyword Engine</div>
-                <div class="feature-desc">NLP algorithms detect urgent triggers, scam terminologies, and suspicious patterns from SMS, WhatsApp, and email text.</div>
-                <div class="feature-arrow"><span>Analyze now</span><span>→</span></div>
+                <div class="feature-desc">Detects urgent triggers, scam terms, payment pressure, and sensitive-data requests in submitted text.</div>
+                <div class="feature-arrow"><span>Analyze now</span><span>&rarr;</span></div>
             </a>
             <a href="check_scheme.jsp" class="feature-card">
-                <div class="feature-icon teal">🌐</div>
+                <div class="feature-icon teal">URL</div>
                 <div class="feature-name">URL Verification</div>
-                <div class="feature-desc">Cross-references submitted links against official GOV.IN databases and known fraud domain blacklists in real-time.</div>
-                <div class="feature-arrow"><span>Check a URL</span><span>→</span></div>
+                <div class="feature-desc">Checks whether submitted links use trusted government-style domains or suspicious public domains.</div>
+                <div class="feature-arrow"><span>Check a URL</span><span>&rarr;</span></div>
             </a>
             <a href="check_scheme.jsp" class="feature-card">
-                <div class="feature-icon purple">👤</div>
+                <div class="feature-icon purple">User</div>
                 <div class="feature-name">Profile Eligibility Match</div>
-                <div class="feature-desc">After verification, the system checks if a genuine scheme matches your income, age, and demographic profile automatically.</div>
-                <div class="feature-arrow"><span>View eligibility</span><span>→</span></div>
+                <div class="feature-desc">After verification, the system checks if a genuine scheme broadly matches your saved income and age profile.</div>
+                <div class="feature-arrow"><span>View eligibility</span><span>&rarr;</span></div>
             </a>
         </div>
 
@@ -733,13 +720,13 @@
             <div>
                 <div class="profile-label">Scheme Eligibility</div>
                 <div class="profile-value" style="color: var(--success);">
-                    <% if (userIncome != null && userIncome <= 800000) { %>✓ Eligible for subsidized schemes<% } else { %>Standard profile<% } %>
+                    <% if (userIncome != null && userIncome <= 800000) { %>Eligible for subsidized schemes<% } else { %>Standard profile<% } %>
                 </div>
             </div>
             <div class="profile-divider"></div>
             <div>
                 <div class="profile-label">Protection Status</div>
-                <div class="profile-value" style="color: var(--success);">🟢 Active</div>
+                <div class="profile-value" style="color: var(--success);">Active</div>
             </div>
         </div>
     </main>

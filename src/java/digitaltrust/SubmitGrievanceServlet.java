@@ -1,49 +1,62 @@
 package digitaltrust;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @WebServlet("/SubmitGrievanceServlet")
 public class SubmitGrievanceServlet extends HttpServlet {
 
-    private static final String DB_URL  = "jdbc:mysql://mysql-379ef001-godwinthomas118-b3da.k.aivencloud.com:24609/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "avnadmin";
-    private static final String DB_PASS = "AVNS_oRjKZHLYNGvSNvLLlZI";
-
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String message = request.getParameter("scam_details");
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
+        String message = TextUtil.clean(request.getParameter("scam_details"));
+        if (message.isEmpty()) {
+            ServletPages.message(response, HttpServletResponse.SC_BAD_REQUEST,
+                "Grievance failed", "Please provide the scam details before submitting.",
+                "index.jsp", "Back to Dashboard");
+            return;
+        }
+
+        if (saveGrievance(message)) {
+            ServletPages.message(response, HttpServletResponse.SC_OK,
+                "Grievance submitted", "Your report has been saved for review.",
+                "index.jsp", "Back to Dashboard");
+        } else {
+            ServletPages.message(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "Grievance unavailable", "Please try again later.",
+                "index.jsp", "Back to Dashboard");
+        }
+    }
+
+    private boolean saveGrievance(String message) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            Db.loadDriver();
+            try (Connection con = Db.getConnection();
+                 PreparedStatement ps = con.prepareStatement(
+                     "INSERT INTO grievances(message, status) VALUES (?,?)")) {
 
-            PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO grievances(message, status) VALUES (?,?)");
-            ps.setString(1, message);
-            ps.setString(2, "Pending");
-            ps.executeUpdate();
-
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
-            out.println("<h2>Grievance Submitted Successfully to Government Portal</h2>");
-            out.println("<br><a href='index.jsp'>Back to Dashboard</a>");
-
+                ps.setString(1, TextUtil.truncate(message, 1000));
+                ps.setString(2, "Pending");
+                ps.executeUpdate();
+                return true;
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
-            out.println("<h3 style='color:red;'>Error submitting grievance: " + e.getMessage() + "</h3>");
-            out.println("<br><a href='index.jsp'>Back to Dashboard</a>");
+            log("Could not save grievance", e);
+            return false;
         }
     }
 }

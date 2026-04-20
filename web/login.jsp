@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — Digital Trust System</title>
+    <title>Sign In - Digital Trust System</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -52,32 +52,6 @@
         @keyframes gridMove {
             0% { transform: translateY(0); }
             100% { transform: translateY(60px); }
-        }
-
-        /* Ambient glow blobs */
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            pointer-events: none;
-            animation: blobFloat 8s ease-in-out infinite;
-        }
-        .blob-1 {
-            width: 500px; height: 500px;
-            background: rgba(99,179,237,0.08);
-            top: -150px; right: -100px;
-            animation-delay: 0s;
-        }
-        .blob-2 {
-            width: 400px; height: 400px;
-            background: rgba(79,209,197,0.06);
-            bottom: -100px; left: -100px;
-            animation-delay: -4s;
-        }
-
-        @keyframes blobFloat {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.05); }
         }
 
         .page-wrap {
@@ -414,9 +388,6 @@
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
     <div class="page-wrap">
         <!-- Brand Panel -->
         <div class="brand-panel">
@@ -431,21 +402,21 @@
                         Protect yourself from<br><em>scheme fraud.</em>
                     </div>
                     <div class="brand-desc">
-                        AI-powered verification system that analyzes government scheme messages, detects fraud in real-time, and matches genuine schemes to your profile.
+                        Rule-based verification that checks scheme messages, risky links, and basic eligibility signals before you trust or report them.
                     </div>
 
                     <div class="brand-stats">
                         <div class="stat">
-                            <div class="stat-num">98.4%</div>
-                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-num">Rules</div>
+                            <div class="stat-label">Detection</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-num">2.3M+</div>
-                            <div class="stat-label">Scans done</div>
+                            <div class="stat-num">URL</div>
+                            <div class="stat-label">Checks</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-num">₹47Cr</div>
-                            <div class="stat-label">Fraud blocked</div>
+                            <div class="stat-num">Profile</div>
+                            <div class="stat-label">Matching</div>
                         </div>
                     </div>
                 </div>
@@ -454,15 +425,15 @@
             <div class="trust-badges">
                 <div class="badge-item">
                     <div class="badge-dot"></div>
-                    NLP Keyword Detection Engine active
+                    Rule-based keyword detection active
                 </div>
                 <div class="badge-item">
                     <div class="badge-dot"></div>
-                    GOV.IN Domain Verification live
+                    GOV.IN domain checks enabled
                 </div>
                 <div class="badge-item">
                     <div class="badge-dot"></div>
-                    Grievance Portal connected
+                    Grievance storage enabled
                 </div>
             </div>
         </div>
@@ -489,7 +460,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit">Sign In to Dashboard →</button>
+                <button type="submit" class="btn-submit">Sign In to Dashboard &rarr;</button>
             </form>
 
             <div class="divider"><span>New here?</span></div>
@@ -501,7 +472,7 @@
 
             <div class="gov-badge">
                 <span>🏛️</span>
-                Authorized Digital India Initiative — Ministry of Electronics & IT
+                Digital Trust student project
             </div>
         </div>
     </div>

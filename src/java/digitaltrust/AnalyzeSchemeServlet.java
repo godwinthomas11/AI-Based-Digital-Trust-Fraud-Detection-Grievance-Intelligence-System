@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -21,184 +20,112 @@ import javax.servlet.http.Part;
 @MultipartConfig(maxFileSize = 16777215)
 public class AnalyzeSchemeServlet extends HttpServlet {
 
-    private static final String DB_URL  = "jdbc:mysql://mysql-379ef001-godwinthomas118-b3da.k.aivencloud.com:24609/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "avnadmin";
-    private static final String DB_PASS = "AVNS_oRjKZHLYNGvSNvLLlZI";
+    private static final int MAX_ANALYSIS_LENGTH = 10000;
+    private static final int MAX_DB_MESSAGE_LENGTH = 255;
 
-    private int calculateScore(String msg) {
-        if (msg == null || msg.trim().isEmpty()) return 0;
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        String rawLower = msg.toLowerCase();
-        String cleanMsg = rawLower.replaceAll("[^a-z0-9 ]", " ");
-
-        int score = 100;
-
-        if (cleanMsg.contains("lottery"))           score -= 25;
-        if (cleanMsg.contains("won"))               score -= 25;
-        if (cleanMsg.contains("winner"))            score -= 25;
-        if (cleanMsg.contains("prize"))             score -= 25;
-        if (cleanMsg.contains("jackpot"))           score -= 25;
-        if (cleanMsg.contains("congratulations"))   score -= 20;
-        if (cleanMsg.contains("selected"))          score -= 15;
-        if (cleanMsg.contains("lucky"))             score -= 15;
-
-        if (cleanMsg.contains("free money"))        score -= 20;
-        if (cleanMsg.contains("free cash"))         score -= 20;
-        if (cleanMsg.contains("free reward"))       score -= 20;
-        if (cleanMsg.contains("claim now"))         score -= 20;
-        if (cleanMsg.contains("claim your"))        score -= 20;
-        if (cleanMsg.contains("act now"))           score -= 20;
-        if (cleanMsg.contains("limited time"))      score -= 20;
-        if (cleanMsg.contains("expire"))            score -= 15;
-        if (cleanMsg.contains("urgent"))            score -= 20;
-        if (cleanMsg.contains("immediately"))       score -= 15;
-        if (cleanMsg.contains("otp"))               score -= 20;
-        if (cleanMsg.contains("account blocked"))   score -= 25;
-        if (cleanMsg.contains("suspended"))         score -= 20;
-        if (cleanMsg.contains("free"))              score -= 15;
-
-        if (cleanMsg.contains("pay"))               score -= 15;
-        if (cleanMsg.contains("fee"))               score -= 15;
-        if (cleanMsg.contains("processing fee"))    score -= 25;
-        if (cleanMsg.contains("registration fee"))  score -= 25;
-        if (cleanMsg.contains("advance"))           score -= 15;
-        if (cleanMsg.contains("deposit"))           score -= 15;
-        if (cleanMsg.contains("transfer"))          score -= 10;
-        if (cleanMsg.contains("wallet"))            score -= 10;
-        if (cleanMsg.contains("upi"))               score -= 10;
-        if (cleanMsg.contains("paytm"))             score -= 10;
-
-        if (cleanMsg.contains("verify"))            score -= 15;
-        if (cleanMsg.contains("click"))             score -= 15;
-        if (cleanMsg.contains("click here"))        score -= 20;
-        if (cleanMsg.contains("open link"))         score -= 20;
-        if (cleanMsg.contains("bank"))              score -= 10;
-        if (cleanMsg.contains("account number"))    score -= 20;
-        if (cleanMsg.contains("password"))          score -= 20;
-        if (cleanMsg.contains("cvv"))               score -= 25;
-        if (cleanMsg.contains("pin"))               score -= 15;
-        if (cleanMsg.contains("aadhaar"))           score -= 15;
-        if (cleanMsg.contains("pan card"))          score -= 15;
-
-        if (rawLower.matches(".*[₹rs\\.\\s]\\s*[0-9,]+.*")) score -= 15;
-
-        boolean hasUrl = rawLower.contains("http")
-                      || rawLower.contains("www")
-                      || rawLower.contains(".com")
-                      || rawLower.contains(".net")
-                      || rawLower.contains(".org")
-                      || rawLower.contains(".in");
-
-        if (hasUrl) {
-            if (rawLower.contains(".gov.in")) {
-                score += 40;
-            } else if (rawLower.contains(".nic.in")) {
-                score += 35;
-            } else if (rawLower.contains(".edu.in") || rawLower.contains(".ac.in")) {
-                score += 10;
-            } else {
-                score -= 40;
-                if (rawLower.contains("freemoney") || rawLower.contains("free-money")) score -= 20;
-                if (rawLower.contains("prize")      || rawLower.contains("win"))        score -= 20;
-                if (rawLower.contains("lottery"))                                        score -= 20;
-                if (rawLower.contains("claim"))                                          score -= 15;
-                if (rawLower.contains("reward"))                                         score -= 15;
-                if (rawLower.contains("lucky"))                                          score -= 15;
-                if (rawLower.contains("gift"))                                           score -= 15;
-                if (rawLower.contains("cash"))                                           score -= 15;
-                if (rawLower.contains("money"))                                          score -= 15;
-                if (rawLower.contains("bit.ly") || rawLower.contains("tinyurl")
-                 || rawLower.contains("t.co")   || rawLower.contains("goo.gl"))         score -= 20;
-            }
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
         }
 
-        int fraudKeywordCount = 0;
-        if (cleanMsg.contains("free"))    fraudKeywordCount++;
-        if (cleanMsg.contains("won"))     fraudKeywordCount++;
-        if (cleanMsg.contains("lottery")) fraudKeywordCount++;
-        if (cleanMsg.contains("prize"))   fraudKeywordCount++;
-        if (cleanMsg.contains("urgent"))  fraudKeywordCount++;
-        if (cleanMsg.contains("click"))   fraudKeywordCount++;
-        if (cleanMsg.contains("verify"))  fraudKeywordCount++;
-        if (cleanMsg.contains("pay"))     fraudKeywordCount++;
-        if (cleanMsg.contains("fee"))     fraudKeywordCount++;
-        if (cleanMsg.contains("claim"))   fraudKeywordCount++;
+        String textToAnalyze = readSubmittedText(request);
+        if (TextUtil.isBlank(textToAnalyze)) {
+            ServletPages.message(response, HttpServletResponse.SC_BAD_REQUEST,
+                "Analysis failed", "Submit a message, URL, or .txt file before analyzing.",
+                "check_scheme.jsp", "Back to Analysis");
+            return;
+        }
 
-        if (fraudKeywordCount >= 3) score -= 20;
-        if (fraudKeywordCount >= 5) score -= 20;
+        textToAnalyze = TextUtil.truncate(textToAnalyze, MAX_ANALYSIS_LENGTH);
+        FraudResult result = FraudAnalyzer.analyze(textToAnalyze);
 
-        if (score < 0)   score = 0;
-        if (score > 100) score = 100;
+        saveAnalysis(textToAnalyze, result);
 
-        return score;
+        request.setAttribute("trustScore", String.valueOf(result.getTrustScore()));
+        request.setAttribute("isGenuine", result.getLabel());
+        request.setAttribute("profileMatch", profileMatches(session, result) ? "Yes" : "No");
+
+        request.getRequestDispatcher("check_scheme.jsp").forward(request, response);
     }
 
-    private String extractTextFromTxt(Part filePart) {
+    private String readSubmittedText(HttpServletRequest request) throws IOException, ServletException {
+        Part textPart = request.getPart("text_file");
+        if (textPart != null && textPart.getSize() > 0) {
+            return extractTextFromTxt(textPart);
+        }
+
+        String message = TextUtil.clean(request.getParameter("message"));
+        if (!message.isEmpty()) {
+            return message;
+        }
+
+        return TextUtil.clean(request.getParameter("url"));
+    }
+
+    private String extractTextFromTxt(Part filePart) throws IOException {
+        String fileName = getSubmittedFileName(filePart).toLowerCase();
+        if (!fileName.endsWith(".txt")) {
+            return "";
+        }
+
         StringBuilder textBuilder = new StringBuilder();
         try (InputStream input = filePart.getInputStream();
              BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(input, StandardCharsets.UTF_8))) {
+                 new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                textBuilder.append(line).append(" ");
+            while ((line = reader.readLine()) != null && textBuilder.length() < MAX_ANALYSIS_LENGTH) {
+                textBuilder.append(line).append(' ');
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return textBuilder.toString();
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String message  = request.getParameter("message");
-        String url      = request.getParameter("url");
-        Part   textPart = request.getPart("text_file");
-
-        String textToAnalyze = "";
-
-        if (textPart != null && textPart.getSize() > 0) {
-            textToAnalyze = extractTextFromTxt(textPart);
-        } else if (message != null && !message.trim().isEmpty()) {
-            textToAnalyze = message;
-        } else if (url != null && !url.trim().isEmpty()) {
-            textToAnalyze = url;
+    private String getSubmittedFileName(Part part) {
+        String header = part.getHeader("content-disposition");
+        if (header == null) {
+            return "";
         }
-
-        int    trustScore = calculateScore(textToAnalyze);
-        String label      = (trustScore >= 60) ? "SAFE" : "FRAUD";
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-
-            PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO analysis(message, score, label) VALUES (?,?,?)");
-            String dbText = textToAnalyze.length() > 255
-                          ? textToAnalyze.substring(0, 255)
-                          : textToAnalyze;
-            ps.setString(1, dbText);
-            ps.setInt(2, trustScore);
-            ps.setString(3, label);
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        HttpSession session      = request.getSession();
-        String      profileMatch = "No";
-        if (label.equals("SAFE")) {
-            Double userIncome = (Double) session.getAttribute("user_income");
-            if (userIncome != null && userIncome <= 800000) {
-                profileMatch = "Yes";
+        for (String token : header.split(";")) {
+            String trimmed = token.trim();
+            if (trimmed.startsWith("filename=")) {
+                return trimmed.substring(trimmed.indexOf('=') + 1).trim().replace("\"", "");
             }
         }
+        return "";
+    }
 
-        request.setAttribute("trustScore",   String.valueOf(trustScore));
-        request.setAttribute("isGenuine",    label);
-        request.setAttribute("profileMatch", profileMatch);
+    private void saveAnalysis(String textToAnalyze, FraudResult result) {
+        try {
+            Db.loadDriver();
+            try (Connection con = Db.getConnection();
+                 PreparedStatement ps = con.prepareStatement(
+                     "INSERT INTO analysis(message, score, label) VALUES (?,?,?)")) {
 
-        request.getRequestDispatcher("check_scheme.jsp").forward(request, response);
+                ps.setString(1, TextUtil.truncate(textToAnalyze, MAX_DB_MESSAGE_LENGTH));
+                ps.setInt(2, result.getTrustScore());
+                ps.setString(3, result.getLabel());
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            log("Could not save analysis result", e);
+        }
+    }
+
+    private boolean profileMatches(HttpSession session, FraudResult result) {
+        if (!result.isSafe()) {
+            return false;
+        }
+
+        Object incomeValue = session.getAttribute("user_income");
+        Object ageValue = session.getAttribute("user_age");
+        double income = incomeValue instanceof Number ? ((Number) incomeValue).doubleValue() : Double.MAX_VALUE;
+        int age = ageValue instanceof Number ? ((Number) ageValue).intValue() : 0;
+
+        return income <= 800000 && age >= 18;
     }
 }

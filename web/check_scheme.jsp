@@ -16,7 +16,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyze Scheme — Digital Trust System</title>
+    <title>Analyze Scheme - Digital Trust System</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -56,16 +56,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(150px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .blob-1 { width: 600px; height: 600px; background: rgba(99,179,237,0.05); top: -200px; right: -150px; }
-        .blob-2 { width: 400px; height: 400px; background: rgba(79,209,197,0.04); bottom: -100px; left: -100px; }
 
         /* NAVBAR */
         .navbar {
@@ -730,7 +720,7 @@
         }
 
         .hiw-step:not(:last-child)::after {
-            content: '→';
+            content: '>';
             position: absolute;
             right: -8px;
             top: 14px;
@@ -762,9 +752,6 @@
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-left">
@@ -782,14 +769,14 @@
                 <div class="user-avatar"><%= userName.substring(0,1).toUpperCase() %></div>
                 <span class="user-name"><%= userName %></span>
             </div>
-            <a href="index.jsp" class="btn-back">← Dashboard</a>
+            <a href="index.jsp" class="btn-back">&larr; Dashboard</a>
         </div>
     </nav>
 
     <main class="main">
         <!-- Page header -->
         <div class="page-header">
-            <div class="page-eyebrow">AI-Powered Analysis</div>
+            <div class="page-eyebrow">Rule-Based Analysis</div>
             <h1 class="page-title">Scheme Authenticity Checker</h1>
             <p class="page-sub">Submit a message, URL, or document to get an instant Trust Score and eligibility check</p>
         </div>
@@ -799,16 +786,16 @@
             <div class="input-card">
                 <div class="card-head">
                     <div class="card-title">Submit for Analysis</div>
-                    <div class="card-badge">NLP Engine</div>
+                    <div class="card-badge">Rule Engine</div>
                 </div>
                 <div class="card-body">
                     <form action="AnalyzeSchemeServlet" method="post" enctype="multipart/form-data" id="analyzeForm">
 
                         <!-- Tabs -->
                         <div class="tabs">
-                            <button type="button" class="tab active" onclick="switchTab('message', this)">📝 Message</button>
-                            <button type="button" class="tab" onclick="switchTab('url', this)">🔗 URL</button>
-                            <button type="button" class="tab" onclick="switchTab('file', this)">📄 File</button>
+                            <button type="button" class="tab active" onclick="switchTab('message', this)">Message</button>
+                            <button type="button" class="tab" onclick="switchTab('url', this)">URL</button>
+                            <button type="button" class="tab" onclick="switchTab('file', this)">File</button>
                         </div>
 
                         <!-- Message panel -->
@@ -822,7 +809,7 @@
                             <label class="field-label">Paste Suspicious Link / URL</label>
                             <input type="url" name="url" class="form-input" placeholder="https://suspicious-site.com/claim-prize">
                             <div style="margin-top: 12px; font-size: 12px; color: var(--muted); line-height: 1.6;">
-                                The system checks whether the domain is an official <span style="color:var(--success)">gov.in</span> site or a suspicious non-government URL.
+                                The system checks whether the domain is a trusted <span style="color:var(--success)">gov.in</span> style site or a suspicious public URL.
                             </div>
                         </div>
 
@@ -831,7 +818,7 @@
                             <label class="field-label">Upload Scheme Document (.txt)</label>
                             <div class="upload-zone" id="uploadZone">
                                 <input type="file" name="text_file" accept=".txt" onchange="handleFileSelect(this)">
-                                <div class="upload-icon">📂</div>
+                                <div class="upload-icon">TXT</div>
                                 <div class="upload-title" id="upload-title">Drop your .txt file here</div>
                                 <div class="upload-sub">or click to browse · Max 16MB</div>
                             </div>
@@ -839,7 +826,7 @@
 
                         <!-- Keyword info -->
                         <div class="keyword-info">
-                            <div class="keyword-title">⚠ Fraud Trigger Keywords</div>
+                            <div class="keyword-title">Fraud Trigger Keywords</div>
                             <div class="keyword-tags">
                                 <span class="keyword-tag tag-bad">lottery</span>
                                 <span class="keyword-tag tag-bad">won</span>
@@ -848,12 +835,12 @@
                                 <span class="keyword-tag tag-bad">click here</span>
                                 <span class="keyword-tag tag-bad">verify bank</span>
                                 <span class="keyword-tag tag-bad">pay fee</span>
-                                <span class="keyword-tag tag-good">.gov.in ✓</span>
+                                <span class="keyword-tag tag-good">.gov.in trusted</span>
                             </div>
                         </div>
 
                         <button type="submit" class="btn-submit">
-                            <span>🔍</span>
+                            <span>Check</span>
                             <span>Analyze Now</span>
                         </button>
                     </form>
@@ -893,19 +880,19 @@
                     </div>
 
                     <div class="verdict-badge <%= trustScore >= 75 ? "safe" : "fraud" %>">
-                        <span><%= trustScore >= 75 ? "✓" : "✗" %></span>
+                        <span><%= trustScore >= 75 ? "OK" : "!" %></span>
                         <span><%= isGenuine %></span>
                     </div>
 
                     <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">
-                        Trust Score · NLP Analysis Complete
+                        Trust Score &middot; Rule Analysis Complete
                     </div>
                 </div>
 
                 <!-- Score breakdown -->
                 <div class="result-details">
                     <div class="detail-row">
-                        <span class="detail-key">📊 Trust Score</span>
+                        <span class="detail-key">Trust Score</span>
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div class="score-bar-bg" style="width:120px">
                                 <div class="score-bar-fill <%= trustScore >= 75 ? "safe" : "fraud" %>" style="width:<%= trustScore %>%"></div>
@@ -914,51 +901,51 @@
                         </div>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-key">🏷️ Verdict</span>
+                        <span class="detail-key">Verdict</span>
                         <span class="detail-val <%= trustScore >= 75 ? "safe" : "fraud" %>">
-                            <%= trustScore >= 75 ? "✓ Genuine Scheme" : "⚠ Possible Fraud" %>
+                            <%= trustScore >= 75 ? "Likely Genuine Scheme" : "Possible Fraud" %>
                         </span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-key">👤 Profile Match</span>
+                        <span class="detail-key">Profile Match</span>
                         <span class="detail-val <%= "Yes".equals(profileMatch) ? "safe" : "warn" %>">
-                            <%= "Yes".equals(profileMatch) ? "✓ You are eligible" : "✗ Profile mismatch" %>
+                            <%= "Yes".equals(profileMatch) ? "You may be eligible" : "Profile mismatch" %>
                         </span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-key">🔒 Threshold</span>
-                        <span class="detail-val" style="color:var(--muted)">Safe ≥ 75 · Fraud &lt; 75</span>
+                        <span class="detail-key">Threshold</span>
+                        <span class="detail-val" style="color:var(--muted)">Safe &ge; 75 &middot; Fraud &lt; 75</span>
                     </div>
                 </div>
 
                 <% if (trustScore < 75) { %>
                 <!-- Fraud alert -->
                 <div class="alert-box fraud-alert">
-                    <div class="alert-title">⚠ High Fraud Risk Detected</div>
+                    <div class="alert-title">Risk Detected</div>
                     <div class="alert-body">This content exhibits multiple red flags associated with known scam patterns. Do not share personal information, click any links, or make any payments.</div>
                 </div>
                 <div class="report-section">
                     <form action="SubmitGrievanceServlet" method="post">
                         <input type="hidden" name="scam_details" value="Fraudulent scheme reported via Digital Trust System">
                         <button type="submit" class="btn-report">
-                            🏛️ Submit Official Grievance to Government Portal
+                            Submit Grievance
                         </button>
                     </form>
                 </div>
                 <% } else { %>
                 <!-- Safe alert -->
                 <div class="alert-box safe-alert">
-                    <div class="alert-title">✓ Scheme Verified as Genuine</div>
+                    <div class="alert-title">Scheme Verified as Genuine</div>
                     <div class="alert-body">This content passes security checks. It appears to be a legitimate government scheme.</div>
                 </div>
                 <% if ("Yes".equals(profileMatch)) { %>
                 <div class="suggestions">
-                    <div class="suggest-title">✓ You are eligible for this scheme</div>
+                    <div class="suggest-title">You may be eligible for this scheme</div>
                     <div class="suggest-item">
-                        <div class="suggest-icon">🌾</div>
+                        <div class="suggest-icon">PM</div>
                         <div>
                             <div class="suggest-name">PM Kisan Samman Nidhi</div>
-                            <div class="suggest-tag">✓ Matches your income bracket</div>
+                            <div class="suggest-tag">Matches your income bracket</div>
                         </div>
                     </div>
                 </div>
@@ -966,14 +953,14 @@
                 <div class="suggestions">
                     <div class="suggest-title">Schemes matching your profile:</div>
                     <div class="suggest-item">
-                        <div class="suggest-icon">🌾</div>
+                        <div class="suggest-icon">PM</div>
                         <div>
                             <div class="suggest-name">PM Kisan Samman Nidhi</div>
                             <div class="suggest-tag">Matches your income bracket</div>
                         </div>
                     </div>
                     <div class="suggest-item">
-                        <div class="suggest-icon">📚</div>
+                        <div class="suggest-icon">ST</div>
                         <div>
                             <div class="suggest-name">State Youth Scholarship Program</div>
                             <div class="suggest-tag">Matches your age group</div>
@@ -986,7 +973,7 @@
                 <% } else { %>
                 <!-- Empty state -->
                 <div class="empty-state">
-                    <div class="empty-icon">🔍</div>
+                    <div class="empty-icon">Check</div>
                     <div class="empty-title">No analysis yet</div>
                     <div class="empty-sub">Submit a scheme message, URL, or upload a document on the left to get an instant Trust Score and eligibility check.</div>
                 </div>
@@ -1004,7 +991,7 @@
                 </div>
                 <div class="hiw-step">
                     <div class="hiw-num">2</div>
-                    <div class="hiw-label">NLP keyword scan runs</div>
+                    <div class="hiw-label">Keyword risk scan runs</div>
                 </div>
                 <div class="hiw-step">
                     <div class="hiw-num">3</div>
@@ -1012,7 +999,7 @@
                 </div>
                 <div class="hiw-step">
                     <div class="hiw-num">4</div>
-                    <div class="hiw-label">Trust Score (0–100) generated</div>
+                    <div class="hiw-label">Trust Score (0-100) generated</div>
                 </div>
                 <div class="hiw-step">
                     <div class="hiw-num">5</div>
@@ -1032,7 +1019,7 @@
 
         function handleFileSelect(input) {
             if (input.files.length > 0) {
-                document.getElementById('upload-title').textContent = '📄 ' + input.files[0].name;
+                document.getElementById('upload-title').textContent = input.files[0].name;
             }
         }
 

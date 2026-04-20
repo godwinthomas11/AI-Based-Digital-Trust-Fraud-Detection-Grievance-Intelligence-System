@@ -1,56 +1,37 @@
 package digitaltrust;
 
-import java.io.*;
-import javax.servlet.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/TrustServlet")
 public class TrustServlet extends HttpServlet {
 
-    private int calculateScore(String msg) {
-        msg = msg.toLowerCase().replaceAll("[^a-zA-Z0-9 ]", "");
-
-        int score = 0;
-
-        if (msg.contains("lottery")) score += 20;
-        if (msg.contains("free"))    score += 15;
-        if (msg.contains("click"))   score += 15;
-        if (msg.contains("verify"))  score += 15;
-        if (msg.contains("bank"))    score += 15;
-
-        if (msg.contains("won")    && msg.contains("rs"))     score += 25;
-        if (msg.contains("urgent") && msg.contains("verify")) score += 20;
-        if (msg.contains("pay")    && msg.contains("fee"))    score += 25;
-
-        if (msg.contains("http") || msg.contains("www")) {
-            if (msg.contains("gov.in")) score -= 30;
-            else                        score += 30;
-        }
-
-        if (score < 0)   score = 0;
-        if (score > 100) score = 100;
-
-        return score;
-    }
-
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        res.setContentType("text/html");
+        String message = TextUtil.clean(request.getParameter("message"));
+        if (message.isEmpty()) {
+            ServletPages.message(response, HttpServletResponse.SC_BAD_REQUEST,
+                "Analysis failed", "Enter a message to analyze.", "index.jsp", "Back");
+            return;
+        }
 
-        String msg   = req.getParameter("message");
-        int    score = calculateScore(msg);
+        FraudResult result = FraudAnalyzer.analyze(message);
 
-        String status;
-        if      (score >= 70) status = "FRAUD";
-        else if (score >= 40) status = "SUSPICIOUS";
-        else                  status = "SAFE";
-
-        PrintWriter out = res.getWriter();
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\">");
+        out.println("<title>Trust Analysis</title></head><body>");
         out.println("<h1>Trust Analysis</h1>");
-        out.println("<h2>Trust Score: " + score + "%</h2>");
-        out.println("<h2>Status: " + status + "</h2>");
-        out.println("<br><a href='index.jsp'>Back</a>");
+        out.println("<h2>Trust Score: " + result.getTrustScore() + "%</h2>");
+        out.println("<h2>Status: " + TextUtil.escapeHtml(result.getLabel()) + "</h2>");
+        out.println("<br><a href=\"index.jsp\">Back</a>");
+        out.println("</body></html>");
     }
 }

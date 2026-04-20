@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account — Digital Trust System</title>
+    <title>Create Account - Digital Trust System</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -48,15 +48,6 @@
             0% { transform: translateY(0); }
             100% { transform: translateY(60px); }
         }
-
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(130px);
-            pointer-events: none;
-        }
-        .blob-1 { width: 600px; height: 600px; background: rgba(99,179,237,0.06); top: -200px; right: -200px; }
-        .blob-2 { width: 400px; height: 400px; background: rgba(79,209,197,0.05); bottom: -100px; left: -100px; }
 
         /* Top nav bar */
         .topbar {
@@ -424,15 +415,12 @@
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
     <div class="topbar">
         <a href="login.jsp" class="logo-wrap">
             <div class="logo-icon">🛡️</div>
             <div class="logo-text">Digital<span>Trust</span></div>
         </a>
-        <a href="login.jsp" class="login-pill">← Back to Sign In</a>
+        <a href="login.jsp" class="login-pill">&larr; Back to Sign In</a>
     </div>
 
     <div class="steps-wrap">
@@ -561,15 +549,15 @@
                 <!-- Actions -->
                 <div class="action-row">
                     <a href="login.jsp" class="btn-secondary">Cancel</a>
-                    <button type="submit" class="btn-primary">Create Profile & Continue →</button>
+                    <button type="submit" class="btn-primary">Create Profile & Continue &rarr;</button>
                 </div>
 
             </form>
 
             <div class="protection-bar">
                 <div class="protect-item">🔐 256-bit SSL Encryption</div>
-                <div class="protect-item">🏛️ Government Verified Platform</div>
-                <div class="protect-item">🔒 Data never sold or shared</div>
+                <div class="protect-item">Profile used for eligibility checks</div>
+                <div class="protect-item">Passwords stored with hashing</div>
             </div>
         </div>
     </div>

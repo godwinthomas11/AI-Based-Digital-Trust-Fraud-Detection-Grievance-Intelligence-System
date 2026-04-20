@@ -1,84 +1,66 @@
 package digitaltrust;
 
-import java.io.*;
-import javax.servlet.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-import java.sql.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/FraudServlet")
 public class fraudServlet extends HttpServlet {
 
-    private static final String DB_URL  = "jdbc:mysql://mysql-379ef001-godwinthomas118-b3da.k.aivencloud.com:24609/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String DB_USER = "avnadmin";
-    private static final String DB_PASS = "AVNS_oRjKZHLYNGvSNvLLlZI";
-
-    private int calculateScore(String msg) {
-        msg = msg.toLowerCase().replaceAll("[^a-zA-Z0-9 ]", "");
-
-        int score = 0;
-
-        if (msg.contains("lottery")) score += 20;
-        if (msg.contains("free"))    score += 15;
-        if (msg.contains("click"))   score += 15;
-        if (msg.contains("verify"))  score += 15;
-        if (msg.contains("bank"))    score += 15;
-
-        if (msg.contains("won")    && msg.contains("rs"))     score += 25;
-        if (msg.contains("urgent") && msg.contains("verify")) score += 20;
-        if (msg.contains("pay")    && msg.contains("fee"))    score += 25;
-
-        if (msg.contains("http") || msg.contains("www")) {
-            if (msg.contains("gov.in")) score -= 30;
-            else                        score += 30;
-        }
-
-        if (score < 0)   score = 0;
-        if (score > 100) score = 100;
-
-        return score;
-    }
-
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        res.setContentType("text/html");
-
-        String msg   = req.getParameter("message");
-        int    score = calculateScore(msg);
-
-        String status;
-        if      (score >= 70) status = "FRAUD";
-        else if (score >= 40) status = "SUSPICIOUS";
-        else                  status = "SAFE";
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-
-            PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO analysis(message, score, label) VALUES (?,?,?)");
-            ps.setString(1, msg);
-            ps.setInt(2, score);
-            ps.setString(3, status);
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        String message = TextUtil.clean(request.getParameter("message"));
+        if (message.isEmpty()) {
+            ServletPages.message(response, HttpServletResponse.SC_BAD_REQUEST,
+                "Fraud check failed", "Enter a message to analyze.", "index.jsp", "Back");
+            return;
         }
 
-        PrintWriter out = res.getWriter();
-        out.println("<h1>Fraud Detection Result</h1>");
-        out.println("<h2>Score: " + score + "%</h2>");
-        out.println("<h2>Status: " + status + "</h2>");
+        FraudResult result = FraudAnalyzer.analyze(message);
+        saveAnalysis(message, result);
 
-        if (status.equals("FRAUD")) {
-            out.println("<form action='GrievanceServlet' method='post'>");
-            out.println("<input type='hidden' name='message' value='" + msg + "'>");
-            out.println("<button type='submit'>Report Grievance</button>");
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\">");
+        out.println("<title>Fraud Detection Result</title></head><body>");
+        out.println("<h1>Fraud Detection Result</h1>");
+        out.println("<h2>Trust Score: " + result.getTrustScore() + "%</h2>");
+        out.println("<h2>Status: " + TextUtil.escapeHtml(result.getLabel()) + "</h2>");
+
+        if (!result.isSafe()) {
+            out.println("<form action=\"GrievanceServlet\" method=\"post\">");
+            out.println("<input type=\"hidden\" name=\"message\" value=\""
+                + TextUtil.escapeHtml(TextUtil.truncate(message, 500)) + "\">");
+            out.println("<button type=\"submit\">Report Grievance</button>");
             out.println("</form>");
         }
 
-        out.println("<br><a href='index.jsp'>Back</a>");
+        out.println("<br><a href=\"index.jsp\">Back</a>");
+        out.println("</body></html>");
+    }
+
+    private void saveAnalysis(String message, FraudResult result) {
+        try {
+            Db.loadDriver();
+            try (Connection con = Db.getConnection();
+                 PreparedStatement ps = con.prepareStatement(
+                     "INSERT INTO analysis(message, score, label) VALUES (?,?,?)")) {
+
+                ps.setString(1, TextUtil.truncate(message, 255));
+                ps.setInt(2, result.getTrustScore());
+                ps.setString(3, result.getLabel());
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            log("Could not save fraud analysis", e);
+        }
     }
 }
