@@ -8,8 +8,13 @@
     String trustScoreStr = (String) request.getAttribute("trustScore");
     String isGenuine = (String) request.getAttribute("isGenuine");
     String profileMatch = (String) request.getAttribute("profileMatch");
+    String previousScoreStr = (String) request.getAttribute("previousScore");
+    String blockedDomain = (String) request.getAttribute("blockedDomain");
+    String blockedPenaltyStr = (String) request.getAttribute("blockedPenalty");
     boolean hasResult = (trustScoreStr != null);
     int trustScore = hasResult ? Integer.parseInt(trustScoreStr) : 0;
+    boolean hasPrevious = (previousScoreStr != null);
+    boolean hasBlocked = (blockedDomain != null);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -916,6 +921,24 @@
                         <span class="detail-key">Threshold</span>
                         <span class="detail-val" style="color:var(--muted)">Safe &ge; 75 &middot; Fraud &lt; 75</span>
                     </div>
+                    <% if (hasBlocked) { %>
+                    <div class="detail-row">
+                        <span class="detail-key">Blocked Domain</span>
+                        <span class="detail-val fraud"><%= blockedDomain %> (&minus;<%= blockedPenaltyStr %>)</span>
+                    </div>
+                    <% } %>
+                    <% if (hasPrevious) { %>
+                    <div class="detail-row">
+                        <span class="detail-key">Previously Analyzed</span>
+                        <span class="detail-val" style="color:var(--muted)">Prior score: <%= previousScoreStr %>%</span>
+                    </div>
+                    <% } %>
+                    <% if (hasPrevious && hasBlocked) { %>
+                    <div class="detail-row">
+                        <span class="detail-key">Combined Score</span>
+                        <span class="detail-val fraud"><%= trustScore %>% (prior <%= previousScoreStr %> &minus; <%= blockedPenaltyStr %>)</span>
+                    </div>
+                    <% } %>
                 </div>
 
                 <% if (trustScore < 75) { %>

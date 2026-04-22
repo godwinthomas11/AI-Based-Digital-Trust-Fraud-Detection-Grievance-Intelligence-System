@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MPJ Enhancement Report - Praveet Gupta</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.5;
+    font-size: 11pt;
+    margin: 0;
+  }
+  .cover {
+    height: 260mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+  }
+  .cover-top { text-align: center; padding-top: 30mm; }
+  .cover-top .college {
+    font-size: 22pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 6mm;
+  }
+  .cover-top .subject {
+    font-size: 14pt;
+    color: #444;
+    margin-bottom: 30mm;
+  }
+  .cover-top .title {
+    font-size: 28pt;
+    font-weight: 800;
+    color: #0b3d91;
+    margin-bottom: 10mm;
+    line-height: 1.25;
+  }
+  .cover-top .subtitle {
+    font-size: 13pt;
+    color: #555;
+    font-style: italic;
+  }
+  .details-box {
+    border: 1.5px solid #0b3d91;
+    border-radius: 8px;
+    padding: 8mm 10mm;
+    margin: 0 auto;
+    width: 110mm;
+    font-size: 12pt;
+  }
+  .details-box .row { display: flex; padding: 2mm 0; border-bottom: 1px dashed #ccc; }
+  .details-box .row:last-child { border-bottom: none; }
+  .details-box .k { width: 40%; font-weight: 600; color: #333; }
+  .details-box .v { width: 60%; color: #111; }
+  .cover-bottom {
+    text-align: center;
+    color: #666;
+    font-size: 11pt;
+    padding-bottom: 8mm;
+  }
+
+  h1 {
+    color: #0b3d91;
+    border-bottom: 2px solid #0b3d91;
+    padding-bottom: 3mm;
+    margin-top: 10mm;
+    font-size: 18pt;
+    page-break-after: avoid;
+  }
+  h2 {
+    color: #114aa8;
+    margin-top: 7mm;
+    font-size: 14pt;
+    page-break-after: avoid;
+  }
+  h3 {
+    color: #222;
+    margin-top: 5mm;
+    font-size: 12pt;
+  }
+  p { margin: 3mm 0; text-align: justify; }
+  ul, ol { margin: 3mm 0 3mm 6mm; }
+  li { margin: 1mm 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4mm 0;
+    font-size: 10pt;
+  }
+  th, td {
+    border: 1px solid #bbb;
+    padding: 2mm 3mm;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #eef3fb; color: #0b3d91; }
+
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 5px;
+    padding: 3mm 4mm;
+    font-family: "Menlo", "Consolas", monospace;
+    font-size: 8.5pt;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+    page-break-inside: avoid;
+  }
+  code {
+    font-family: "Menlo", "Consolas", monospace;
+    background: #f6f8fa;
+    padding: 0.5mm 1.5mm;
+    border-radius: 3px;
+    font-size: 9.5pt;
+  }
+  .diff-add { background: #e6ffec; display: block; }
+  .diff-del { background: #ffebe9; display: block; text-decoration: line-through; color: #555; }
+  .callout {
+    background: #fff8e1;
+    border-left: 4px solid #f4b400;
+    padding: 3mm 4mm;
+    margin: 4mm 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 10.5pt;
+  }
+  .callout-ok {
+    background: #e7f5ec;
+    border-left-color: #34a853;
+  }
+  .ss-placeholder {
+    border: 2px dashed #999;
+    background: #f9f9f9;
+    height: 90mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-style: italic;
+    margin: 4mm 0;
+    border-radius: 6px;
+    text-align: center;
+    padding: 4mm;
+  }
+  .ss-img {
+    max-width: 100%;
+    max-height: 180mm;
+    display: block;
+    margin: 4mm auto;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    page-break-inside: avoid;
+  }
+  .ss-caption {
+    text-align: center;
+    font-size: 10pt;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 6mm;
+  }
+  .sec { page-break-before: always; }
+  .two-col { display: flex; gap: 4mm; }
+  .two-col > div { flex: 1; }
+  .file-label {
+    display: inline-block;
+    background: #0b3d91;
+    color: white;
+    padding: 1mm 3mm;
+    border-radius: 3px;
+    font-size: 9.5pt;
+    font-family: Menlo, monospace;
+    margin-bottom: 2mm;
+  }
+  footer.page-footer {
+    position: running(footer);
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<section class="cover">
+  <div class="cover-top">
+    <div class="college">MIT World Peace University</div>
+    <div class="subject">Mini Project Using Java (MPJ) &mdash; Practical Examination</div>
+    <div class="title">Project Enhancement Report<br>
+      <span style="font-size:16pt; font-weight:600; color:#114aa8;">AI-Based Digital Trust Fraud Detection &amp; Grievance Intelligence System</span>
+    </div>
+    <div class="subtitle">Config-Driven Blocked Domain Detection with Historical Score Awareness</div>
+  </div>
+
+  <div class="details-box">
+    <div class="row"><div class="k">Name</div><div class="v">Praveet Gupta</div></div>
+    <div class="row"><div class="k">Roll Number</div><div class="v">57</div></div>
+    <div class="row"><div class="k">PRN</div><div class="v">1032240179</div></div>
+    <div class="row"><div class="k">Class</div><div class="v">TY CSE (AI &amp; DS)</div></div>
+    <div class="row"><div class="k">Subject</div><div class="v">MPJ &ndash; Mini Project Using Java</div></div>
+    <div class="row"><div class="k">College</div><div class="v">MIT World Peace University</div></div>
+  </div>
+
+  <div class="cover-bottom">
+    Submitted for evaluation &mdash; Academic Year 2025&ndash;2026
+  </div>
+</section>
+
+<!-- SECTION 1 -->
+<section>
+  <h1>1. Enhancement Requested</h1>
+  <p>
+    As part of the MPJ practical examination, the faculty assigned an enhancement task
+    over and above the baseline project. The specific ask was:
+  </p>
+  <div class="callout">
+    <strong>Requirement:</strong> &ldquo;Create a configuration file listing blocked / banned
+    domains. When a scheme message is checked and it contains one of these domains, the
+    system must flag it as suspicious. Additionally, if the same message has been analyzed
+    previously and is present in the analysis database, the system must display the previous
+    score along with a new score computed using the domain-ban configuration.&rdquo;
+  </div>
+  <p>
+    The enhancement therefore has two linked parts:
+  </p>
+  <ol>
+    <li><strong>Config-driven domain blocklist</strong> &mdash; an externally editable file so the list of banned domains can be maintained without touching the Java code.</li>
+    <li><strong>Historical-aware scoring</strong> &mdash; if a message is already in the existing <code>analysis</code> table, combine its previous trust score with the penalty from the blocked-domain match so the final displayed score reflects both the older history and the new red flag.</li>
+  </ol>
+</section>
+
+<!-- SECTION 2 -->
+<section>
+  <h1>2. My Approach</h1>
+
+  <h2>2.1 Why a <code>.properties</code> file?</h2>
+  <p>
+    A Java <code>Properties</code> file was chosen for the blocklist because it is:
+  </p>
+  <ul>
+    <li>Human-readable &mdash; any evaluator, faculty, or admin can open and edit it in a text editor.</li>
+    <li>A first-class citizen in Java &mdash; loaded in two lines via <code>Properties.load(InputStream)</code>.</li>
+    <li>Supports a key-value pair naturally, which fits our need perfectly: <code>domain = penalty_points</code>. This allows different domains to carry different severities.</li>
+    <li>Placed under <code>WEB-INF/</code>, so it is packaged inside the webapp and protected from direct HTTP access.</li>
+  </ul>
+
+  <h2>2.2 Why the combined score uses <em>previous score &minus; penalty</em></h2>
+  <p>
+    If a message has been seen before, it already carries a trust score in the database.
+    A fresh analysis gives a new score. To satisfy the faculty&rsquo;s ask of
+    &ldquo;previous score + new score&rdquo;, I compute:
+  </p>
+  <pre>combinedScore = clamp( previousScore &minus; blockedPenalty , 0 , 100 )</pre>
+  <p>
+    This captures both pieces of evidence: the historical trust level <em>and</em> the
+    freshly detected red flag. The result is clamped into the 0&ndash;100 range to keep the UI meaningful.
+  </p>
+
+  <h2>2.3 Minimum-touch, zero-regression design</h2>
+  <p>
+    Existing callers of <code>FraudAnalyzer.analyze(input)</code> continue to work
+    unchanged because the original single-argument method is preserved as a pass-through
+    to the new overload with an empty blocklist. The database schema is also untouched &mdash;
+    the existing <code>analysis</code> table is reused for historical lookup.
+  </p>
+</section>
+
+<!-- SECTION 3 -->
+<section class="sec">
+  <h1>3. Architecture &amp; Flow</h1>
+  <h2>3.1 Request flow (new)</h2>
+  <pre>  [ User submits message / URL on check_scheme.jsp ]
+              |
+              v
+  [ AnalyzeSchemeServlet.doPost ]
+              |
+              |--- reads /WEB-INF/blocked_domains.properties at init()
+              |    into Map&lt;String,Integer&gt; blockedDomains
+              |
+              v
+  [ FraudAnalyzer.analyze(text, blockedDomains) ]
+              |
+              |--- extracts URLs, matches host against blocklist
+              |--- if hit: applies penalty, records blockedDomain,
+              |            forces label = FRAUD
+              v
+  [ Servlet queries analysis table:
+    SELECT score FROM analysis WHERE message = ? ]
+              |
+              v
+  [ If previous hit AND blocked domain match:
+    combinedScore = clamp(previous - penalty, 0, 100) ]
+              |
+              v
+  [ Forward to check_scheme.jsp with
+    previousScore, blockedDomain, blockedPenalty,
+    and final trustScore attributes ]
+              |
+              v
+  [ JSP renders existing detail card +
+    three new rows (blocked domain, prior score, combined) ]</pre>
+
+  <h2>3.2 Files touched</h2>
+  <table>
+    <tr><th>#</th><th>File</th><th>Nature</th><th>Purpose</th></tr>
+    <tr><td>1</td><td><code>web/WEB-INF/blocked_domains.properties</code></td><td>New</td><td>Admin-editable blocklist with per-domain penalty</td></tr>
+    <tr><td>2</td><td><code>src/java/digitaltrust/FraudResult.java</code></td><td>Modified</td><td>Carries blocked-domain metadata up to the servlet</td></tr>
+    <tr><td>3</td><td><code>src/java/digitaltrust/FraudAnalyzer.java</code></td><td>Modified</td><td>Adds blocklist-aware URL scoring</td></tr>
+    <tr><td>4</td><td><code>src/java/digitaltrust/AnalyzeSchemeServlet.java</code></td><td>Modified</td><td>Loads config, queries prior score, computes combined</td></tr>
+    <tr><td>5</td><td><code>web/check_scheme.jsp</code></td><td>Modified</td><td>Renders the new rows in the result card</td></tr>
+  </table>
+</section>
+
+<!-- SECTION 4 -->
+<section class="sec">
+  <h1>4. The Configuration File</h1>
+  <p><span class="file-label">web/WEB-INF/blocked_domains.properties</span></p>
+  <pre># Blocked domains config
+# Format: domain=penalty_points (bigger = more suspicious)
+# Any URL whose host matches one of these will be flagged
+# and have its penalty applied to the trust score.
+
+fake-scheme.xyz=60
+lottery-win.top=60
+scamportal.online=55
+pm-yojana-verify.site=65
+govt-reward.info=55
+claim-subsidy.xyz=60
+freecash-india.top=70
+praveetgupta.gov.in=50</pre>
+  <p>
+    Entries can be added, removed, or have their penalty tuned without recompiling the
+    project. A Tomcat restart is sufficient to pick up the changes. This is the &ldquo;config-driven&rdquo; aspect of the enhancement.
+  </p>
+</section>
+
+<!-- SECTION 5 -->
+<section class="sec">
+  <h1>5. Code Changes &mdash; Before vs. After</h1>
+
+  <h2>5.1 <code>FraudResult.java</code></h2>
+  <p>Two new fields and a setter added so the blocked-domain info can travel from the analyzer to the servlet.</p>
+  <h3>Added (new code)</h3>
+  <pre>private String blockedDomain;
+private int blockedPenalty;
+
+String getBlockedDomain() {
+    return blockedDomain;
+}
+
+int getBlockedPenalty() {
+    return blockedPenalty;
+}
+
+void setBlockedDomain(String blockedDomain, int penalty) {
+    this.blockedDomain = blockedDomain;
+    this.blockedPenalty = penalty;
+}</pre>
+
+  <h2>5.2 <code>FraudAnalyzer.java</code></h2>
+  <h3>Before &mdash; original <code>analyze()</code> signature</h3>
+  <pre>static FraudResult analyze(String input) {
+    String raw = TextUtil.clean(input).toLowerCase(Locale.ROOT);
+    ...
+    UrlSignal urlSignal = scoreUrls(raw);
+    ...
+    return new FraudResult(trustScore, label, risk);
+}</pre>
+
+  <h3>After &mdash; overload accepts blocklist; hit forces FRAUD</h3>
+  <pre>static FraudResult analyze(String input) {
+    return analyze(input, Collections.&lt;String, Integer&gt;emptyMap());
+}
+
+static FraudResult analyze(String input, Map&lt;String, Integer&gt; blockedDomains) {
+    ...
+    UrlSignal urlSignal = scoreUrls(raw, blockedDomains);
+    ...
+    String label;
+    if (urlSignal.blockedDomain != null) {
+        label = "FRAUD";
+    } else if (trustScore &gt;= 75) {
+        label = "SAFE";
+    } else if (trustScore &gt;= 50) {
+        label = "SUSPICIOUS";
+    } else {
+        label = "FRAUD";
+    }
+
+    FraudResult result = new FraudResult(trustScore, label, risk);
+    if (urlSignal.blockedDomain != null) {
+        result.setBlockedDomain(urlSignal.blockedDomain,
+                                urlSignal.blockedPenalty);
+    }
+    return result;
+}</pre>
+
+  <h3>Key addition inside <code>scoreUrls()</code></h3>
+  <pre>if (blockedDomains != null &amp;&amp; blockedDomains.containsKey(host)) {
+    int penalty = blockedDomains.get(host);
+    risk += penalty;
+    if (blockedHit == null) {
+        blockedHit = host;
+        blockedHitPenalty = penalty;
+    }
+    continue;   // skip normal URL scoring for this host
+}</pre>
+
+  <h2>5.3 <code>AnalyzeSchemeServlet.java</code></h2>
+
+  <h3>Config load at init()</h3>
+  <pre>private Map&lt;String, Integer&gt; blockedDomains = Collections.emptyMap();
+
+@Override
+public void init() throws ServletException {
+    super.init();
+    this.blockedDomains = loadBlockedDomains();
+    log("Loaded " + blockedDomains.size() + " blocked domains from config");
+}
+
+private Map&lt;String, Integer&gt; loadBlockedDomains() {
+    Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+    try (InputStream in = getServletContext()
+            .getResourceAsStream("/WEB-INF/blocked_domains.properties")) {
+        if (in == null) return map;
+        Properties props = new Properties();
+        props.load(in);
+        for (String key : props.stringPropertyNames()) {
+            String host = key.trim().toLowerCase(Locale.ROOT);
+            if (host.startsWith("www.")) host = host.substring(4);
+            try {
+                int penalty = Integer.parseInt(props.getProperty(key).trim());
+                map.put(host, penalty);
+            } catch (NumberFormatException ignored) { }
+        }
+    } catch (IOException e) {
+        log("Failed to read blocked_domains.properties", e);
+    }
+    return map;
+}</pre>
+
+  <h3>Historical lookup and combined score</h3>
+  <pre>FraudResult result = FraudAnalyzer.analyze(textToAnalyze, blockedDomains);
+
+String dbMessage = TextUtil.truncate(textToAnalyze, MAX_DB_MESSAGE_LENGTH);
+Integer previousScore = lookupPreviousScore(dbMessage);
+
+saveAnalysis(dbMessage, result);
+
+int displayScore = result.getTrustScore();
+if (previousScore != null &amp;&amp; result.getBlockedDomain() != null) {
+    displayScore = clamp(previousScore - result.getBlockedPenalty(), 0, 100);
+}
+
+request.setAttribute("trustScore", String.valueOf(displayScore));
+request.setAttribute("isGenuine", result.getLabel());
+request.setAttribute("profileMatch",
+        profileMatches(session, result) ? "Yes" : "No");
+if (previousScore != null) {
+    request.setAttribute("previousScore",
+                         String.valueOf(previousScore));
+}
+if (result.getBlockedDomain() != null) {
+    request.setAttribute("blockedDomain", result.getBlockedDomain());
+    request.setAttribute("blockedPenalty",
+                         String.valueOf(result.getBlockedPenalty()));
+}</pre>
+
+  <h3>The SQL used for historical lookup</h3>
+  <pre>SELECT score FROM analysis
+WHERE message = ?
+ORDER BY id DESC
+LIMIT 1</pre>
+
+  <h2>5.4 <code>check_scheme.jsp</code></h2>
+  <h3>Added to top-of-page scriptlet</h3>
+  <pre>String previousScoreStr = (String) request.getAttribute("previousScore");
+String blockedDomain    = (String) request.getAttribute("blockedDomain");
+String blockedPenaltyStr= (String) request.getAttribute("blockedPenalty");
+boolean hasPrevious = (previousScoreStr != null);
+boolean hasBlocked  = (blockedDomain != null);</pre>
+
+  <h3>Three new conditional rows in the results card</h3>
+  <pre>&lt;% if (hasBlocked) { %&gt;
+&lt;div class="detail-row"&gt;
+    &lt;span class="detail-key"&gt;Blocked Domain&lt;/span&gt;
+    &lt;span class="detail-val fraud"&gt;
+        &lt;%= blockedDomain %&gt; (&amp;minus;&lt;%= blockedPenaltyStr %&gt;)
+    &lt;/span&gt;
+&lt;/div&gt;
+&lt;% } %&gt;
+&lt;% if (hasPrevious) { %&gt;
+&lt;div class="detail-row"&gt;
+    &lt;span class="detail-key"&gt;Previously Analyzed&lt;/span&gt;
+    &lt;span class="detail-val" style="color:var(--muted)"&gt;
+        Prior score: &lt;%= previousScoreStr %&gt;%
+    &lt;/span&gt;
+&lt;/div&gt;
+&lt;% } %&gt;
+&lt;% if (hasPrevious &amp;&amp; hasBlocked) { %&gt;
+&lt;div class="detail-row"&gt;
+    &lt;span class="detail-key"&gt;Combined Score&lt;/span&gt;
+    &lt;span class="detail-val fraud"&gt;
+        &lt;%= trustScore %&gt;%
+        (prior &lt;%= previousScoreStr %&gt; &amp;minus; &lt;%= blockedPenaltyStr %&gt;)
+    &lt;/span&gt;
+&lt;/div&gt;
+&lt;% } %&gt;</pre>
+</section>
+
+<!-- SECTION 6 -->
+<section class="sec">
+  <h1>6. Deployment Strategy: Two Live Versions</h1>
+  <p>
+    To allow a side-by-side demonstration of the baseline product and the enhanced version,
+    the original deployed webapp was duplicated before any edits were applied. Both
+    copies run under the same Tomcat instance and the same MySQL database, so the
+    &ldquo;previously analyzed&rdquo; feature works against a shared history.
+  </p>
+  <table>
+    <tr><th>Version</th><th>URL</th><th>State</th></tr>
+    <tr><td>Old (baseline)</td><td>http://localhost:8080/DigitalTrustProject1_old/</td><td>Frozen &mdash; unchanged copy taken before enhancement</td></tr>
+    <tr><td>New (enhanced)</td><td>http://localhost:8080/DigitalTrustProject1/</td><td>Contains config file, modified Java classes and JSP</td></tr>
+  </table>
+  <p>
+    Additionally, the Git repository was tagged <code>v1-original-baseline</code> immediately before
+    starting the enhancement work. This provides a second safety net &mdash;
+    the full original source tree can be restored at any time with <code>git checkout v1-original-baseline</code>.
+  </p>
+</section>
+
+<!-- SECTION 7 -->
+<section class="sec">
+  <h1>7. Screenshots</h1>
+
+  <h2>7.1 Old UI &mdash; baseline version</h2>
+  <p>
+    This is the analysis result page as it appeared <em>before</em> the enhancement.
+    The detail card shows only the existing rows: Trust Score, Verdict, Profile Match and Threshold.
+    There is no concept of a blocked-domain row or a historical combined score.
+  </p>
+  <p>Route: <code>http://localhost:8080/DigitalTrustProject1_old/</code></p>
+  <img src="ss1_old.jpg" alt="Old UI analysis result" class="ss-img">
+  <div class="ss-caption">Fig. 7.1 &mdash; Baseline analysis result (pre-enhancement)</div>
+
+  <h2>7.2 New UI &mdash; enhanced version</h2>
+  <p>
+    After the enhancement, the same analysis page shows the new rows contributed by
+    the blocked-domain config and the historical lookup. When a URL in the message
+    matches an entry in <code>blocked_domains.properties</code>, a &ldquo;Blocked Domain&rdquo; row
+    appears with the exact penalty, and the verdict is forced to FRAUD regardless of
+    other scoring. If the same message has been seen before, &ldquo;Previously Analyzed&rdquo;
+    and &ldquo;Combined Score&rdquo; rows are shown as well, making the historical reasoning transparent.
+  </p>
+  <p>Route: <code>http://localhost:8080/DigitalTrustProject1/</code></p>
+  <img src="ss2_new.jpg" alt="New enhanced UI analysis result" class="ss-img">
+  <div class="ss-caption">Fig. 7.2 &mdash; Enhanced analysis result (blocked domain + combined score)</div>
+</section>
+
+<!-- SECTION 8 -->
+<section class="sec">
+  <h1>8. Demo Walkthrough</h1>
+  <ol>
+    <li>Start Tomcat locally using <code>~/start-trust.sh</code>. Both webapp contexts become available.</li>
+    <li>Open the <strong>old</strong> version at <code>/DigitalTrustProject1_old/</code>, log in and analyze a scheme message containing <code>http://fake-scheme.xyz/claim</code>. Note the absence of any &ldquo;Blocked Domain&rdquo; row.</li>
+    <li>Open the <strong>new</strong> version at <code>/DigitalTrustProject1/</code>, log in, analyze the same message. The result card now shows the new &ldquo;Blocked Domain&rdquo; row with the exact penalty and flips the verdict to FRAUD.</li>
+    <li>Analyze the same message a second time in the new version &mdash; &ldquo;Previously Analyzed&rdquo; and &ldquo;Combined Score&rdquo; rows appear, with the score calculated as <em>previous &minus; penalty</em>.</li>
+    <li>Open <code>web/WEB-INF/blocked_domains.properties</code>, add a brand-new domain (for example <code>praveetgupta.gov.in=50</code>), copy it to the deployed <code>webapps/</code> path, restart Tomcat. Analyze a message containing that new domain &mdash; it now flags as FRAUD without a single line of Java being touched. This proves the design is truly config-driven.</li>
+  </ol>
+</section>
+
+<!-- SECTION 9 -->
+<section class="sec">
+  <h1>9. Conclusion</h1>
+  <p>
+    The enhancement delivers exactly what was asked: an externally editable blocklist,
+    runtime enforcement of that blocklist against URLs found in scheme messages, and a
+    combined trust score that fuses historical database evidence with the new domain
+    penalty. The design is deliberately minimal &mdash; five files touched, no database
+    schema changes, no breakage of existing callers &mdash; which makes the system safe to
+    extend and easy to review.
+  </p>
+  <div class="callout callout-ok">
+    <strong>Outcome:</strong> The enhanced build is deployed alongside the original
+    baseline, allowing a direct side-by-side demonstration. A git tag preserves the
+    original source as a second layer of reversibility.
+  </div>
+  <p style="margin-top: 20mm; text-align: right;"><em>&mdash; Praveet Gupta, Roll&nbsp;57, PRN&nbsp;1032240179</em></p>
+</section>
+
+</body>
+</html>

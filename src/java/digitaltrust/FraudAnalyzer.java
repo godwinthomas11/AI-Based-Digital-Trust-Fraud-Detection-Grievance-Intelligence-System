@@ -3,8 +3,10 @@ package digitaltrust;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +26,10 @@ final class FraudAnalyzer {
     }
 
     static FraudResult analyze(String input) {
+        return analyze(input, Collections.<String, Integer>emptyMap());
+    }
+
+    static FraudResult analyze(String input, Map<String, Integer> blockedDomains) {
         String raw = TextUtil.clean(input).toLowerCase(Locale.ROOT);
         if (raw.isEmpty()) {
             return new FraudResult(0, "NO_INPUT", 100);
@@ -80,7 +86,7 @@ final class FraudAnalyzer {
             risk += 15;
         }
 
-        UrlSignal urlSignal = scoreUrls(raw);
+        UrlSignal urlSignal = scoreUrls(raw, blockedDomains);
         risk += urlSignal.risk;
         positive += urlSignal.positive;
 
@@ -94,7 +100,9 @@ final class FraudAnalyzer {
 
         int trustScore = clamp(100 - risk + positive, 0, 100);
         String label;
-        if (trustScore >= 75) {
+        if (urlSignal.blockedDomain != null) {
+            label = "FRAUD";
+        } else if (trustScore >= 75) {
             label = "SAFE";
         } else if (trustScore >= 50) {
             label = "SUSPICIOUS";
@@ -102,7 +110,11 @@ final class FraudAnalyzer {
             label = "FRAUD";
         }
 
-        return new FraudResult(trustScore, label, risk);
+        FraudResult result = new FraudResult(trustScore, label, risk);
+        if (urlSignal.blockedDomain != null) {
+            result.setBlockedDomain(urlSignal.blockedDomain, urlSignal.blockedPenalty);
+        }
+        return result;
     }
 
     static int fraudScore(String input) {
@@ -136,15 +148,27 @@ final class FraudAnalyzer {
         return count;
     }
 
-    private static UrlSignal scoreUrls(String raw) {
+    private static UrlSignal scoreUrls(String raw, Map<String, Integer> blockedDomains) {
         Matcher matcher = URL_PATTERN.matcher(raw);
         int risk = 0;
         int positive = 0;
+        String blockedHit = null;
+        int blockedHitPenalty = 0;
 
         while (matcher.find()) {
             String host = extractHost(matcher.group(1));
             if (host.isEmpty()) {
                 risk += 15;
+                continue;
+            }
+
+            if (blockedDomains != null && blockedDomains.containsKey(host)) {
+                int penalty = blockedDomains.get(host);
+                risk += penalty;
+                if (blockedHit == null) {
+                    blockedHit = host;
+                    blockedHitPenalty = penalty;
+                }
                 continue;
             }
 
@@ -164,7 +188,7 @@ final class FraudAnalyzer {
             }
         }
 
-        return new UrlSignal(risk, positive);
+        return new UrlSignal(risk, positive, blockedHit, blockedHitPenalty);
     }
 
     private static String extractHost(String value) {
@@ -198,10 +222,14 @@ final class FraudAnalyzer {
     private static final class UrlSignal {
         private final int risk;
         private final int positive;
+        private final String blockedDomain;
+        private final int blockedPenalty;
 
-        private UrlSignal(int risk, int positive) {
+        private UrlSignal(int risk, int positive, String blockedDomain, int blockedPenalty) {
             this.risk = risk;
             this.positive = positive;
+            this.blockedDomain = blockedDomain;
+            this.blockedPenalty = blockedPenalty;
         }
     }
 }
