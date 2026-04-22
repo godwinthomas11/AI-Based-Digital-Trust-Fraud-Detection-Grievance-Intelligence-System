@@ -600,6 +600,7 @@
             <div class="nav-links">
                 <a href="index.jsp" class="nav-link active">Dashboard</a>
                 <a href="check_scheme.jsp" class="nav-link">Analyze Scheme</a>
+                <a href="dashboard" class="nav-link">My Dashboard</a>
             </div>
         </div>
         <div class="nav-right">
@@ -611,6 +612,7 @@
                 <div class="user-avatar"><%= userName.substring(0,1).toUpperCase() %></div>
                 <span class="user-name"><%= userName %></span>
             </div>
+            <a href="dashboard" class="nav-link">My Dashboard</a>
             <a href="LogoutServlet" class="btn-logout">Sign Out</a>
         </div>
     </nav>
