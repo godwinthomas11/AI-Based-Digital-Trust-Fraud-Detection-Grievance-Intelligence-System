@@ -1,100 +1,122 @@
-# Digital Trust & Fraud Detection System
+# Digital Trust, Fraud Detection & Grievance Intelligence System
 
-Java, JSP, Servlet, and MySQL web app for checking suspicious government-scheme messages, calculating a trust score, and saving grievances for risky content.
+A Java-based web application that helps users identify whether a government scheme message, URL, or uploaded `.txt` file appears genuine or fraudulent using a rule-based trust scoring engine.
 
-Live app: https://ai-based-digital-trust-fraud-detection.onrender.com
+The system allows users to register, log in, analyze suspicious scheme-related content, receive a Trust Score, classify content as `SAFE`, `SUSPICIOUS`, or `FRAUD`, submit grievances, and view their activity through a dashboard.
+
+---
+
+## Live Demo
+
+[Open Project](https://ai-based-digital-trust-fraud-detection.onrender.com/DigitalTrustProject1/login.jsp)
+
+---
+
+## Project Overview
+
+Fraudulent messages and fake government scheme links are common methods used to mislead users into sharing sensitive information or making payments. This project provides a simple web-based platform where users can check suspicious content before trusting it.
+
+The application analyzes user-submitted messages, URLs, or text files and generates a **Trust Score from 0 to 100**. Based on the score, the system classifies the content as:
+
+- `SAFE`
+- `SUSPICIOUS`
+- `FRAUD`
+
+The project also includes a grievance reporting module where users can report suspicious schemes and track related feedback.
+
+> Note: The fraud detection logic is rule-based. It uses keyword matching, URL checks, and fraud-risk signals rather than a trained machine learning model.
+
+---
 
 ## Features
-- Rule-based fraud detection
-- Trust Score from 0 to 100
-- `SAFE`, `SUSPICIOUS`, and `FRAUD` labels
-- URL checks for trusted `.gov.in` and `.nic.in` style domains
-- Message, URL, and `.txt` file analysis
+
+### User Authentication
 - User registration and login
-- PBKDF2 password hashing
-- Session-based dashboard access
-- Basic profile eligibility matching
-- Grievance reporting
-- MySQL database integration through JDBC
+- Session-based authentication
+- Secure password hashing using PBKDF2-HMAC-SHA256
+- Logout functionality
 
-## Project Structure
+### Fraud Detection
+- Analyze government scheme messages
+- Analyze suspicious URLs
+- Upload and analyze `.txt` files
+- Generate a Trust Score from 0 to 100
+- Classify content as SAFE, SUSPICIOUS, or FRAUD
+
+### Rule-Based Scoring Engine
+The system checks for:
+- Suspicious keywords
+- Urgency/pressure phrases such as “claim now”, “urgent”, or “act now”
+- Requests for sensitive data such as OTP, CVV, PIN, Aadhaar, PAN, or password
+- Payment-related terms such as processing fee, registration fee, UPI, Paytm, or deposit
+- Trusted government domains such as `.gov.in` and `.nic.in`
+- Suspicious public domains and URL shorteners
+
+### User Dashboard
+- View profile details
+- View analysis history
+- Track number of analyzed messages
+- Track fraud/suspicious counts
+- View submitted grievances
+- Submit feedback
+
+### Grievance Module
+- Report suspicious schemes
+- Store grievance records in MySQL
+- Track grievance-related feedback
+
+### Deployment
+- WAR-based deployment on Apache Tomcat
+- Docker/Render deployment support
+- Database credentials managed through environment variables
+
+---
+
+## Tech Stack
+
+### Frontend
+- JSP
+- HTML
+- CSS
+- JavaScript
+
+### Backend
+- Java Servlets
+- JDBC
+- MVC-style architecture
+
+### Database
+- MySQL
+
+### Security
+- PBKDF2-HMAC-SHA256 password hashing
+- Session management
+- PreparedStatement-based database queries
+- Input sanitization utilities
+
+### Deployment
+- Apache Tomcat
+- NetBeans/Ant
+- Docker
+- Render
+
+---
+
+## System Architecture
+
+The project follows a simple MVC-style structure:
+
 ```text
-src/java/digitaltrust/       Java servlet logic and shared helpers
-web/                         JSP frontend
-build/web/                   Built web app output used by the WAR
-dist/DigitalTrustProject1.war Deployable WAR copied by Dockerfile
-nbproject/                   NetBeans project configuration
-```
-
-## Environment Variables
-Set these in Render or your local Tomcat environment:
-
-```text
-DB_URL=jdbc:mysql://your-aiven-host:port/defaultdb?useSSL=true&requireSSL=true&serverTimezone=UTC
-DB_USER=your_database_user
-DB_PASSWORD=your_database_password
-```
-
-The app also accepts these aliases: `AIVEN_DB_URL`, `AIVEN_DB_USER`, `AIVEN_DB_PASSWORD`, `JDBC_DATABASE_URL`, `JDBC_DATABASE_USERNAME`, and `JDBC_DATABASE_PASSWORD`.
-
-## Database Tables
-```sql
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    age INT NOT NULL,
-    address VARCHAR(500) NOT NULL,
-    blood_group VARCHAR(5) NOT NULL,
-    marital_status VARCHAR(20) NOT NULL,
-    income DOUBLE NOT NULL
-);
-
-CREATE TABLE analysis (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    message VARCHAR(255) NOT NULL,
-    score INT NOT NULL,
-    label VARCHAR(20) NOT NULL
-);
-
-CREATE TABLE grievances (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    message VARCHAR(1000) NOT NULL,
-    status VARCHAR(30) NOT NULL
-);
-```
-
-## How It Works
-1. User registers and logs in.
-2. User submits a message, URL, or `.txt` file.
-3. The servlet validates and cleans the input.
-4. `FraudAnalyzer` applies weighted risk rules for scam wording, pressure tactics, sensitive-data requests, payment requests, and suspicious URLs.
-5. The app stores the result and shows a trust score.
-6. Risky content can be submitted as a grievance.
-
-## How to Run Locally
-1. Install Apache Tomcat and MySQL Connector/J.
-2. Create the MySQL tables above.
-3. Set the database environment variables.
-4. Import the project into NetBeans.
-5. Build and run on Tomcat.
-6. Open `http://localhost:8080/DigitalTrustProject1/`.
-
-## Deployment
-The project deploys on Render using the checked-in WAR:
-
-```dockerfile
-FROM tomcat:9.0
-COPY dist/DigitalTrustProject1.war /usr/local/tomcat/webapps/
-```
-
-After changing Java or JSP files, rebuild `build/web` and `dist/DigitalTrustProject1.war`, then push to the branch Render deploys from.
-
-## Security Notes
-- Do not commit database credentials.
-- Configure production credentials only through Render environment variables.
-- Previously committed credentials should be rotated.
-- New passwords are stored with PBKDF2 hashes.
-- Existing plain-text user passwords are upgraded to hashed passwords after a successful login.
-- User-facing errors avoid printing database exception details.
+User Interface (JSP Pages)
+        |
+        v
+Servlet Controllers
+        |
+        v
+Business Logic / Fraud Analyzer
+        |
+        v
+Database Layer using JDBC
+        |
+        v
+MySQL Database
