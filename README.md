@@ -8,7 +8,7 @@ The system allows users to register, log in, analyze suspicious scheme-related c
 
 ## Live Demo
 
-[Open Project](https://ai-based-digital-trust-fraud-detection.onrender.com/DigitalTrustProject1/login.jsp)
+[Open Project](https://ai-based-digital-trust-fraud-detection.onrender.com/login.jsp)
 
 ---
 
